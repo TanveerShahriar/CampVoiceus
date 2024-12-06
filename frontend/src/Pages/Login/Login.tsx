@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -53,21 +54,18 @@ const Login: React.FC = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await fetch('http://localhost:5000/api/users/login', {
-          method: 'POST',
+        const response = await axios.post('http://localhost:5000/api/users/login', formData, {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
         });
-  
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status} ${response.statusText}`);
-        }
-  
-        const data = await response.json();
-
-        localStorage.setItem('token', data.token);
+    
+        const { token } = response.data;
+    
+        // Store the token in local storage
+        localStorage.setItem('token', token);
+    
+        // Navigate to the desired route
         navigate('/');
       } catch (error) {
         console.error('Error submitting the form:', error);

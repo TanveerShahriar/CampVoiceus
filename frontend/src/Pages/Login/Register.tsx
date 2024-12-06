@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -66,23 +67,20 @@ const Register: React.FC = () => {
     if (validateForm()) {
 
       try {
-        const response = await fetch('http://localhost:5000/api/users/register', {
-          method: 'POST',
+        await axios.post('http://localhost:5000/api/users/register', formData, {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
         });
-  
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status} ${response.statusText}`);
-        }
-  
-        await response.json();
+    
+        // Navigate to the login page after successful registration
         navigate('/login');
       } catch (error) {
-        console.error('Error submitting the form:', error);
-        alert('Failed to register. Please try again later.');
+        if (axios.isAxiosError(error)) {
+          console.error('Error submitting the form:', error.response?.data || error.message);
+        } else {
+          console.error('Unexpected error:', error);
+        }
       }
     }
   };
