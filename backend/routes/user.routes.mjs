@@ -3,6 +3,8 @@ import { UserController } from '../controllers/index.mjs';
 
 const router = Router();
 
-router.get('/', UserController.getUser);
+router.get('/', UserController.welcome);
+router.post('/register', UserController.registerUser);
+router.post('/login', UserController.loginUser);
 
 export default router;

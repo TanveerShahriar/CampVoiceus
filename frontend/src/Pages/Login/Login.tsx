@@ -2,23 +2,20 @@ import axios from 'axios';
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Register: React.FC = () => {
+const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
     password: '',
   });
 
   const [errors, setErrors] = useState({
-    name: '',
     email: '',
     password: '',
   });
 
   // Using useRef to reference form fields
-  const nameRef = useRef<HTMLInputElement | null>(null);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
@@ -32,13 +29,8 @@ const Register: React.FC = () => {
 
   const validateForm = (): boolean => {
     let valid = true;
-    let errorMessages = { name: '', email: '', password: '' };
+    let errorMessages = { email: '', password: '' };
 
-    if (!formData.name) {
-      valid = false;
-      errorMessages.name = 'Name is required';
-      nameRef.current?.focus(); // Focus on name input if there's an error
-    }
     if (!formData.email) {
       valid = false;
       errorMessages.email = 'Email is required';
@@ -52,59 +44,40 @@ const Register: React.FC = () => {
       valid = false;
       errorMessages.password = 'Password is required';
       passwordRef.current?.focus(); // Focus on password input if there's an error
-    } else if (formData.password.length < 8) {
-      valid = false;
-      errorMessages.password = 'Password must be at least 6 characters';
-      passwordRef.current?.focus(); // Focus on password input if it's too short
     }
 
     setErrors(errorMessages);
     return valid;
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-
       try {
-        await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/register`, formData, {
+        const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/login`, formData, {
           headers: {
             'Content-Type': 'application/json',
           },
         });
     
-        // Navigate to the login page after successful registration
-        navigate('/login');
+        const { token } = response.data;
+    
+        // Store the token in local storage
+        localStorage.setItem('token', token);
+    
+        // Navigate to the desired route
+        navigate('/');
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error('Error submitting the form:', error.response?.data || error.message);
-        } else {
-          console.error('Unexpected error:', error);
-        }
+        console.error('Error submitting the form:', error);
+        alert('Failed to login. Please try again later.');
       }
     }
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold text-center mb-6">Register</h2>
-      <form onSubmit={handleRegister}>
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            ref={nameRef}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
-          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-        </div>
-
+      <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
+      <form onSubmit={handleLogin}>
         <div className="mb-4">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email
@@ -141,11 +114,11 @@ const Register: React.FC = () => {
           type="submit"
           className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
-          Register
+          Login
         </button>
       </form>
     </div>
   );
 };
 
-export default Register;
+export default Login;

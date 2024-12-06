@@ -1,1 +1,3 @@
-export const User = require('./user.model');
+import User from "./user.model.mjs";
+
+export { User };
