@@ -52,8 +52,6 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('Login Form Submitted:', formData);
-
       try {
         const response = await fetch('http://localhost:5000/api/users/login', {
           method: 'POST',

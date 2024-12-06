@@ -1,6 +1,9 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -61,7 +64,6 @@ const Register: React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('Form Submitted:', formData);
 
       try {
         const response = await fetch('http://localhost:5000/api/users/register', {
@@ -76,9 +78,8 @@ const Register: React.FC = () => {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
   
-        const data = await response.json();
-        console.log('Server Response:', data);
-        alert('Registration successful!');
+        await response.json();
+        navigate('/login');
       } catch (error) {
         console.error('Error submitting the form:', error);
         alert('Failed to register. Please try again later.');
