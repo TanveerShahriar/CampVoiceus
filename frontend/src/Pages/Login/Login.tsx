@@ -1,6 +1,9 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -67,8 +70,7 @@ const Login: React.FC = () => {
         const data = await response.json();
 
         localStorage.setItem('token', data.token);
-        alert('Login successful!');
-        console.log('Server Response:', data);
+        navigate('/');
       } catch (error) {
         console.error('Error submitting the form:', error);
         alert('Failed to login. Please try again later.');
