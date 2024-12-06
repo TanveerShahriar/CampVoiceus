@@ -1,5 +1,13 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import User from '../models/user.model.mjs';
+
+const generateToken = (user) => {
+    return jwt.sign(
+        { id: user._id, email: user.email }, // Payload
+        process.env.JWT_SECRET_KEY,          // Secret key for signing
+    );
+};
 
 export async function welcome(req, res) {
     res.send("Hello World!");
@@ -46,15 +54,10 @@ export async function loginUser(req, res){
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
+
+        const token = generateToken(user);
     
-        res.status(200).json({
-            message: 'Login successful',
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-            },
-        });
+        res.status(200).json({ token });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server error' });
