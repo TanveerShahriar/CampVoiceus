@@ -67,7 +67,7 @@ const Register: React.FC = () => {
     if (validateForm()) {
 
       try {
-        await axios.post('http://localhost:5000/api/users/register', formData, {
+        await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/register`, formData, {
           headers: {
             'Content-Type': 'application/json',
           },

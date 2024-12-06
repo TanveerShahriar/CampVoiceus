@@ -54,7 +54,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        const response = await axios.post('http://localhost:5000/api/users/login', formData, {
+        const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/login`, formData, {
           headers: {
             'Content-Type': 'application/json',
           },
