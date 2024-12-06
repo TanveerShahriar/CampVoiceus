@@ -12,14 +12,15 @@ const CustomLink: React.FC<CustomLinkProps> = ({ children, to, ...props }) => {
   const match = useMatch({ path: resolved.pathname, end: true });
 
   return (
-    <div className="font-bold text-3xl p-1">
+    <div>
       <Link
-        style={{
-          color: match ? 'black' : 'blue',
-          textDecoration: 'none',
-        }}
         to={to}
         {...props}
+        className={`text-lg font-semibold px-4 py-2 rounded-md ${
+          match
+            ? 'bg-white text-indigo-600'
+            : 'text-white hover:bg-indigo-700 transition'
+        }`}
       >
         {children}
       </Link>

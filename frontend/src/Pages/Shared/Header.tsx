@@ -1,11 +1,11 @@
 import CustomLink from "./CustomLink";
 
 export default function Header() {
-    return (
-      <h1 className="text-3xl font-bold underline">
-        <CustomLink to="/">Home</CustomLink>
-        <CustomLink to="/register">Register</CustomLink>
-        <CustomLink to="/login">Login</CustomLink>
-      </h1>
-    )
+  return (
+    <nav className="flex justify-around items-center bg-indigo-600 p-4 text-white shadow-lg">
+      <CustomLink to="/">Home</CustomLink>
+      <CustomLink to="/register">Register</CustomLink>
+      <CustomLink to="/login">Login</CustomLink>
+    </nav>
+  );
 }
