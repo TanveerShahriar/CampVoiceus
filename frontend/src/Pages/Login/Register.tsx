@@ -58,10 +58,31 @@ const Register: React.FC = () => {
     return valid;
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
       console.log('Form Submitted:', formData);
+
+      try {
+        const response = await fetch('http://localhost:5000/api/users/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+  
+        const data = await response.json();
+        console.log('Server Response:', data);
+        alert('Registration successful!');
+      } catch (error) {
+        console.error('Error submitting the form:', error);
+        alert('Failed to register. Please try again later.');
+      }
     }
   };
 
