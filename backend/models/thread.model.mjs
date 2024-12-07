@@ -4,8 +4,8 @@ import mongoose from 'mongoose';
 const CommentSchema = new mongoose.Schema({
   userId: { type: String, required: true },
   content: { type: String, required: true },
-  upvotes: { type: Number, default: 0 },
-  downvotes: { type: Number, default: 0 },
+  upvotes: { type: [String], default: [] }, // Array of userIds who upvoted the comment
+  downvotes: { type: [String], default: [] }, // Array of userIds who downvoted the comment
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -15,8 +15,8 @@ const ThreadSchema = new mongoose.Schema({
   content: { type: String, required: true },
   authorId: { type: String, required: true },
   comments: { type: [CommentSchema], default: [] },
-  upvotes: { type: Number, default: 0 },
-  downvotes: { type: Number, default: 0 },
+  upvotes: { type: [String], default: [] }, // Array of userIds who upvoted the thread
+  downvotes: { type: [String], default: [] }, // Array of userIds who downvoted the thread
   createdAt: { type: Date, default: Date.now },
 });
 
