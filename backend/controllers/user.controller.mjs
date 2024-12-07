@@ -33,7 +33,6 @@ export async function registerUser(req, res) {
     
         res.status(201).json({
             message: 'User registered successfully',
-            user: { id: newUser._id, name: newUser.name, email: newUser.email },
         });
         } catch (error) {
             console.error('Error in registerUser:', error);

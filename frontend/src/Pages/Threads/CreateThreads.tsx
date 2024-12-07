@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-export default function CreateThreads({ jwtToken }: { jwtToken: string }) {
+export default function CreateThreads() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -27,21 +27,18 @@ export default function CreateThreads({ jwtToken }: { jwtToken: string }) {
 
       const threadData = {
         ...formData,
-        authorId: token, // Set the authorId from JWT
+        author: token, // Set the authorId from JWT
       };
 
-      console.log(threadData);
+      // Post data to the backend
+      await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/createthread`, threadData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    //   // Post data to the backend
-    //   const response = await axios.post("http://your-api-url/threads", threadData, {
-    //     headers: {
-    //       Authorization: `Bearer ${jwtToken}`,
-    //     },
-    //   });
-
-    //   setSuccess(true);
-    //   setFormData({ title: "", content: "" });
-    //   alert("Thread created successfully!");
+      setSuccess(true);
+      setFormData({ title: "", content: "" });
     } catch (err) {
       console.error(err);
       setError("Failed to create the thread. Please try again.");
