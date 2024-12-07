@@ -4,6 +4,7 @@ import Home from "./Pages/Home/Home";
 import Register from "./Pages/Login/Register";
 import Login from "./Pages/Login/Login";
 import RequireAuth from "./Pages/Login/RequireAuth";
+import CreateThreads from "./Pages/Threads/CreateThreads";
 
 export default function App() {
   return (
@@ -14,6 +15,13 @@ export default function App() {
         <Route path='/' element={
             <RequireAuth>
               <Home></Home>
+            </RequireAuth>
+          }>
+        </Route>
+
+        <Route path='/createthread' element={
+            <RequireAuth>
+              <CreateThreads></CreateThreads>
             </RequireAuth>
           }>
         </Route>
