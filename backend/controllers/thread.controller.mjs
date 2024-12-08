@@ -19,3 +19,12 @@ export async function createThread(req, res) {
             res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+export async function homeThreads(req, res) {
+    try {
+        const threads = await Thread.find();
+        res.status(200).json(threads);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch threads" });
+    }
+}
