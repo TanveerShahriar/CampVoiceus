@@ -53,25 +53,47 @@ export default function Home() {
                             </p>
                             <p className="text-gray-700 mb-4">{thread.content}</p>
 
-                            <div className="flex items-center space-x-4">
-                                <button
-                                    className={`py-1 px-3 rounded-md border ${
-                                        false
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
-                                    }`}
-                                >
-                                    ▲ {thread.upvotes.length}
-                                </button>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4">
+                                    <div>
+                                        <button
+                                            className={`py-1 px-3 rounded-md border ${
+                                                false
+                                                    ? "bg-blue-500 text-white"
+                                                    : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
+                                            }`}
+                                        >
+                                            ▲
+                                        </button>
+                                        <button
+                                            className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
+                                        >
+                                            {thread.upvotes.length}
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <button
+                                            className={`py-1 px-3 rounded-md border ${
+                                                false
+                                                    ? "bg-red-500 text-white"
+                                                    : "bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white"
+                                            }`}
+                                        >
+                                            ▼
+                                        </button>
+                                        <button
+                                            className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
+                                        >
+                                            {thread.downvotes.length}
+                                        </button>
+                                    </div>
+                                </div>
 
                                 <button
-                                    className={`py-1 px-3 rounded-md border ${
-                                        false
-                                            ? "bg-red-500 text-white"
-                                            : "bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white"
-                                    }`}
+                                    className="py-1 px-4 rounded-md border bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white"
                                 >
-                                    ▼ {thread.downvotes.length}
+                                    Comment
                                 </button>
                             </div>
                         </div>
