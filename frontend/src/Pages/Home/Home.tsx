@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import VotesModal from "./VotesModal";
+import CreateThread from "./CreateThread";
 
 type Thread = {
     _id: string;
@@ -13,6 +14,11 @@ type Thread = {
 
 export default function Home() {
     const [threads, setThreads] = useState<Thread[]>([]);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleOpenModal = () => {
+        setIsOpen(true);
+    };
 
     useEffect(() => {
         // Fetch threads from the backend
@@ -27,16 +33,7 @@ export default function Home() {
 
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg">
-            <p className="text-gray-700 text-center mb-6">
-                Discover threads or create your own!
-            </p>
-
-            <Link
-                to="/createthread"
-                className="block w-full py-3 px-5 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center mb-8"
-            >
-                Create Your Own Thread
-            </Link>
+            <CreateThread></CreateThread>
 
             <div className="space-y-6">
                 {threads.length > 0 ? (
@@ -66,6 +63,7 @@ export default function Home() {
                                             ▲
                                         </button>
                                         <button
+                                            onClick={handleOpenModal}
                                             className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
                                         >
                                             {thread.upvotes.length}
@@ -83,6 +81,7 @@ export default function Home() {
                                             ▼
                                         </button>
                                         <button
+                                            onClick={handleOpenModal}
                                             className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
                                         >
                                             {thread.downvotes.length}
@@ -104,6 +103,10 @@ export default function Home() {
                     </p>
                 )}
             </div>
+
+            {isOpen && 
+                <VotesModal isOpenState={[isOpen, setIsOpen]}></VotesModal>
+            }
         </div>
     );
 }
