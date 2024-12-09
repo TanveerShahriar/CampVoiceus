@@ -8,46 +8,32 @@ const VotesModal: React.FC<ModalProps> = ({ isOpenState }) => {
   const [isOpen, setIsOpen] = isOpenState;
 
   const handleCloseModal = () => {
-        setIsOpen(false);
-    };
+    setIsOpen(false);
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div 
-        style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            backdropFilter: 'blur(8px)',   // This will blur the background
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-        }}
-        // Optional: close if user clicks outside the modal container
-        onClick={handleCloseModal}
+    <div
+      className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50"
+      onClick={handleCloseModal}
+    >
+      <div
+        className="w-3/4 max-w-[900px] bg-white rounded-lg p-4 shadow-lg relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-semibold">Modal Title</h2>
+        <p className="mt-2 text-gray-600">
+          This is some info inside the modal. It occupies about 75% of the screen width.
+        </p>
+        <button
+          onClick={handleCloseModal}
+          className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors duration-200 text-3xl font-bold"
+          aria-label="Close"
         >
-        <div 
-            style={{
-            width: '75vw',    // 75% of viewport width
-            maxWidth: '900px',
-            background: '#fff',
-            borderRadius: '8px',
-            padding: '1rem',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            position: 'relative',
-            }}
-            // Stop click event from bubbling up to the parent overlay
-            onClick={(e) => e.stopPropagation()}
-        >
-            <h2>Modal Title</h2>
-            <p>This is some info inside the modal. It occupies about 75% of the screen width.</p>
-            <button onClick={handleCloseModal} style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-            Close
-            </button>
-        </div>
+          &times; {/* Unicode for '×' symbol */}
+        </button>
+      </div>
     </div>
   );
 };
