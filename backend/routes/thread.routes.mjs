@@ -6,5 +6,6 @@ const router = Router();
 router.post('/createthread', ThreadController.createThread);
 router.post('/homethreads', ThreadController.homeThreads);
 router.post('/upvote', ThreadController.upvote);
+router.post('/downvote', ThreadController.downvote);
 
 export default router;

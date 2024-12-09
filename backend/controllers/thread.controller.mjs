@@ -61,4 +61,38 @@ export async function upvote(req, res) {
         console.error('Error handling upvote:', error);
         return res.status(500).json({ error: 'An error occurred while upvoting' });
     }
-};
+}
+
+export async function downvote(req, res) {
+    const { downvoter, threadId } = req.body;
+    
+    const decoded = jwt.verify(downvoter, process.env.JWT_SECRET_KEY);
+    const downvoterId = decoded.id;
+
+    if (!downvoterId) {
+        return res.status(400).json({ error: 'User name is required for upvoting' });
+    }
+
+    try {
+        const thread = await Thread.findById(threadId);
+
+        if (!thread) {
+            return res.status(404).json({ error: 'Thread not found' });
+        }
+
+        if (thread.downvotes.includes(downvoterId)) {
+            return res.status(400).json({ error: 'User has already upvoted this thread' });
+        }
+
+        thread.upvotes = thread.upvotes.filter((id) => id !== downvoterId);
+
+        thread.downvotes.push(downvoterId);
+
+        await thread.save();
+
+        return res.status(200).json({ message: 'Upvoted successfully', thread });
+    } catch (error) {
+        console.error('Error handling upvote:', error);
+        return res.status(500).json({ error: 'An error occurred while upvoting' });
+    }
+}

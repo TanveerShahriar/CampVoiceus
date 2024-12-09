@@ -17,9 +17,11 @@ interface HomeThreadProps {
 
 const HomeThread: React.FC<HomeThreadProps> = ({ thread, setIsOpen }) => {
     const [upvotes, setUpvotes] = useState(0);
+    const [downvotes, setDownvotes] = useState(0);
 
     useEffect(() => {
         setUpvotes(thread.upvotes.length);
+        setDownvotes(thread.downvotes.length);
     }, []);
 
     const handleOpenModal = () => {
@@ -36,6 +38,21 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread, setIsOpen }) => {
         try {
             await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/upvote`, upvoteData);
             setUpvotes((prevUpvotes) => prevUpvotes + 1);
+        } catch (err: any) {
+            console.log("error");
+        }
+    };
+
+    const handleDownvote = async (threadId : string) => {
+        const token = localStorage.getItem('token');
+        const downvoteData = {
+            downvoter : token, // Set the authorId from JWT
+            threadId
+        };
+        
+        try {
+            await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/downvote`, downvoteData);
+            setDownvotes((pervDownvotes) => pervDownvotes + 1);
         } catch (err: any) {
             console.log("error");
         }
@@ -74,6 +91,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread, setIsOpen }) => {
 
                         <div>
                             <button
+                            onClick={() => handleDownvote(thread._id)}
                                 className={`py-1 px-3 rounded-md border ${
                                     false
                                     ? "bg-red-500 text-white"
@@ -86,7 +104,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread, setIsOpen }) => {
                                 onClick={handleOpenModal}
                                 className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
                             >
-                                {thread.downvotes.length}
+                                {downvotes}
                             </button>
                         </div>
                     </div>
