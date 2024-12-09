@@ -123,11 +123,11 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
                 </div>
 
                 {isOpenUpvote && 
-                    <VotesModal voteType="Upvotes" isOpenState={[isOpenUpvote, setIsOpenUpvote]}></VotesModal>
+                    <VotesModal voteType="Upvotes" votes={thread.upvotes} isOpenState={[isOpenUpvote, setIsOpenUpvote]}></VotesModal>
                 }
 
                 {isOpenDownvote && 
-                    <VotesModal voteType="Downvotes" isOpenState={[isOpenDownvote, setIsOpenDownvote]}></VotesModal>
+                    <VotesModal voteType="Downvotes" votes={thread.downvotes} isOpenState={[isOpenDownvote, setIsOpenDownvote]}></VotesModal>
                 }
             </div>
         </div>
