@@ -1,4 +1,10 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+
+interface Voter {
+  id: string;
+  name: string;
+}
 
 interface ModalProps {
   voteType: String;
@@ -8,6 +14,29 @@ interface ModalProps {
 
 const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
   const [isOpen, setIsOpen] = isOpenState;
+  const [voters, setVoters] = useState<Voter[]>([]);
+
+  useEffect(() => {
+    const fetchVoterNames = async () => {
+      try {
+        const voterData = await Promise.all(
+          votes.map(async (id) => {
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/getuserbyid`, {id}, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+            return { id, name: response.data.name };
+          })
+        );
+        setVoters(voterData);
+      } catch (error) {
+        console.error('Error fetching voter names:', error);
+      }
+    };
+
+    fetchVoterNames();
+  }, [votes]);
 
   const handleCloseModal = () => {
     setIsOpen(false);
@@ -25,7 +54,14 @@ const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-semibold">{voteType}</h2>
-        {votes.map(voter => <p key={voter}>{voter}</p>)}
+        {voters.map((voter) => (
+          <div
+            key={voter.id}
+            className="flex items-center bg-gray-100 hover:bg-gray-200 transition p-3 rounded-lg shadow-sm"
+          >
+            <span className="text-gray-800 font-medium">{voter.name}</span>
+          </div>
+        ))}
         <button
           onClick={handleCloseModal}
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors duration-200 text-3xl font-bold"
