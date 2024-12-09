@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from 'react';
+import VotesModal from "./VotesModal";
 
 interface Thread {
     _id: string;
@@ -12,20 +13,25 @@ interface Thread {
 
 interface HomeThreadProps {
     thread: Thread;
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const HomeThread: React.FC<HomeThreadProps> = ({ thread, setIsOpen }) => {
+const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
     const [upvotes, setUpvotes] = useState(0);
     const [downvotes, setDownvotes] = useState(0);
+    const [isOpenUpvote, setIsOpenUpvote] = useState(false);
+    const [isOpenDownvote, setIsOpenDownvote] = useState(false);
 
     useEffect(() => {
         setUpvotes(thread.upvotes.length);
         setDownvotes(thread.downvotes.length);
     }, []);
 
-    const handleOpenModal = () => {
-        setIsOpen(true);
+    const handleOpenUpvoteModal = () => {
+        setIsOpenUpvote(true);
+    };
+
+    const handleOpenDownvoteModal = () => {
+        setIsOpenDownvote(true);
     };
 
     const handleUpvote = async (threadId : string) => {
@@ -82,7 +88,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread, setIsOpen }) => {
                             ▲
                             </button>
                             <button
-                                onClick={handleOpenModal}
+                                onClick={handleOpenUpvoteModal}
                                 className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
                             >
                                 {upvotes}
@@ -101,7 +107,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread, setIsOpen }) => {
                             ▼
                             </button>
                             <button
-                                onClick={handleOpenModal}
+                                onClick={handleOpenDownvoteModal}
                                 className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
                             >
                                 {downvotes}
@@ -115,6 +121,14 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread, setIsOpen }) => {
                         Comment
                     </button>
                 </div>
+
+                {isOpenUpvote && 
+                    <VotesModal voteType="Upvotes" isOpenState={[isOpenUpvote, setIsOpenUpvote]}></VotesModal>
+                }
+
+                {isOpenDownvote && 
+                    <VotesModal voteType="Downvotes" isOpenState={[isOpenDownvote, setIsOpenDownvote]}></VotesModal>
+                }
             </div>
         </div>
     );

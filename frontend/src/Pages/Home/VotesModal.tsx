@@ -1,10 +1,11 @@
 import React from 'react';
 
 interface ModalProps {
-    isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  voteType: String;
+  isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
 }
 
-const VotesModal: React.FC<ModalProps> = ({ isOpenState }) => {
+const VotesModal: React.FC<ModalProps> = ({ voteType, isOpenState }) => {
   const [isOpen, setIsOpen] = isOpenState;
 
   const handleCloseModal = () => {
@@ -22,7 +23,7 @@ const VotesModal: React.FC<ModalProps> = ({ isOpenState }) => {
         className="w-3/4 max-w-[900px] bg-white rounded-lg p-4 shadow-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-semibold">Modal Title</h2>
+        <h2 className="text-xl font-semibold">{voteType}</h2>
         <p className="mt-2 text-gray-600">
           This is some info inside the modal. It occupies about 75% of the screen width.
         </p>

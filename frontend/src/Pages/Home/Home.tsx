@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import VotesModal from "./VotesModal";
 import CreateThread from "./CreateThread";
 import HomeThreads from "./HomeThreads";
 
@@ -15,7 +14,6 @@ type Thread = {
 
 export default function Home() {
     const [threads, setThreads] = useState<Thread[]>([]);
-    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         // Fetch threads from the backend
@@ -32,11 +30,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg">
             <CreateThread></CreateThread>
 
-            <HomeThreads threads={threads} setIsOpen={setIsOpen}></HomeThreads>
-
-            {isOpen && 
-                <VotesModal isOpenState={[isOpen, setIsOpen]}></VotesModal>
-            }
+            <HomeThreads threads={threads}></HomeThreads>
         </div>
     );
 }

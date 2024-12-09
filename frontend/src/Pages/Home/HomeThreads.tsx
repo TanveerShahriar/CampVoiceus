@@ -12,16 +12,15 @@ interface Thread {
 
 interface HomeThreadsProps {
     threads: Thread[];
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const HomeThreads: React.FC<HomeThreadsProps> = ({ threads, setIsOpen }) => {
+const HomeThreads: React.FC<HomeThreadsProps> = ({ threads}) => {
     return (
         <div>
             <div className="space-y-6">
                 {threads.length > 0 ? (
                     threads.map((thread) => (
-                        <HomeThread key={thread._id} thread={thread} setIsOpen={setIsOpen}></HomeThread>
+                        <HomeThread key={thread._id} thread={thread}></HomeThread>
                 ))
             ) : (
                     <p className="text-gray-500 text-center">
