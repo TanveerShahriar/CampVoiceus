@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import VotesModal from "./VotesModal";
+import { jwtDecode } from "jwt-decode";
 
 interface Thread {
     _id: string;
@@ -15,10 +16,27 @@ interface HomeThreadProps {
     thread: Thread;
 }
 
+interface DecodedToken {
+    id: string;
+    email: string;
+}
+
 const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
     const [stateThread, setStateThread] = useState<Thread>(thread);
-    const [isOpenUpvote, setIsOpenUpvote] = useState(false);
-    const [isOpenDownvote, setIsOpenDownvote] = useState(false);
+    const [isOpenUpvote, setIsOpenUpvote] = useState<boolean>(false);
+    const [isOpenDownvote, setIsOpenDownvote] = useState<boolean>(false);
+    const [userId, setUserId] = useState<string>("");
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+
+        if (token) {
+            const decoded: DecodedToken = jwtDecode(token);
+            setUserId(decoded.id);
+        } else {
+            console.error("No token found");
+        }
+    }, []);
 
     const handleOpenUpvoteModal = () => {
         setIsOpenUpvote(true);
@@ -77,8 +95,9 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
                         <div>
                             <button
                                 onClick={() => handleUpvote(stateThread._id)}
+                                disabled={stateThread.upvotes.includes(userId)}
                                 className={`py-1 px-3 rounded-md border ${
-                                    false
+                                    stateThread.upvotes.includes(userId)
                                         ? "bg-blue-500 text-white"
                                         : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
                                 }`}
@@ -95,9 +114,10 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
 
                         <div>
                             <button
-                            onClick={() => handleDownvote(stateThread._id)}
+                                onClick={() => handleDownvote(stateThread._id)}
+                                disabled={stateThread.downvotes.includes(userId)}
                                 className={`py-1 px-3 rounded-md border ${
-                                    false
+                                    stateThread.downvotes.includes(userId)
                                     ? "bg-red-500 text-white"
                                     : "bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white"
                                 }`}
