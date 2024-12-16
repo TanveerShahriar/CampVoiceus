@@ -19,11 +19,13 @@ const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
   useEffect(() => {
     const fetchVoterNames = async () => {
       try {
+        const token = localStorage.getItem("token");
         const voterData = await Promise.all(
           votes.map(async (id) => {
             const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/getuserbyid`, {id}, {
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
               },
             });
             return { id, name: response.data.name };

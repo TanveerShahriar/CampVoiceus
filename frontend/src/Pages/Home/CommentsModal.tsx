@@ -23,9 +23,11 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
     useEffect(() => {
         const fetchCommentUserNames = async () => {
             try {
+                const token = localStorage.getItem("token");
                 const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/getthreadbyid`, { id : threadId }, {
                     headers: {
                       'Content-Type': 'application/json',
+                      Authorization: `Bearer ${token}`,
                     },
                   });
                 
@@ -39,6 +41,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                             {
                                 headers: {
                                     'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${token}`,
                                 },
                             }
                         );
@@ -72,7 +75,14 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                 threadId,
                 content: newComment,
                 token
-            });
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
 
             if (response.data && response.data.thread) {
                 const newComment = response.data.thread.comments.slice(-1)[0]; // Get the last added comment
@@ -82,6 +92,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                     {
                         headers: {
                             'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
                         },
                     }
                 );
