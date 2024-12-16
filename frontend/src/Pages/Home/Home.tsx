@@ -16,8 +16,18 @@ export default function Home() {
     const [threads, setThreads] = useState<Thread[]>([]);
 
     useEffect(() => {
-        // Fetch threads from the backend
-        axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/homethreads`)
+        const token = localStorage.getItem("token");
+
+        axios
+            .post(
+                `${import.meta.env.VITE_SERVER_URL}/threads/homethreads`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
             .then((response) => {
                 setThreads(response.data);
             })
