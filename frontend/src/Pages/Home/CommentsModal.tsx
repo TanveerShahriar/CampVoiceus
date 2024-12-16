@@ -67,7 +67,18 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }
             });
 
             if (response.data && response.data.thread) {
-                setCommentsWithNames(response.data.thread.comments);
+                const newComment = response.data.thread.comments.slice(-1)[0]; // Get the last added comment
+                const userResponse = await axios.post(
+                    `${import.meta.env.VITE_SERVER_URL}/users/getuserbyid`,
+                    { id: newComment.userId },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
+                const updatedComment = { ...newComment, userName: userResponse.data.name || 'Unknown' };
+                setCommentsWithNames((prev) => [...prev, updatedComment]); // Append new comment
                 setNewComment(""); // Clear input field after submission
             }
         } catch (error) {
