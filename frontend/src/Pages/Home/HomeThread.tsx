@@ -165,7 +165,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
                 }
 
                 {isOpenComment && 
-                    <CommentsModal comments={stateThread.comments} isOpenState={[isOpenComment, setIsOpenComment]}></CommentsModal>
+                    <CommentsModal comments={stateThread.comments} isOpenState={[isOpenComment, setIsOpenComment]} threadId={stateThread._id}></CommentsModal>
                 }
             </div>
         </div>

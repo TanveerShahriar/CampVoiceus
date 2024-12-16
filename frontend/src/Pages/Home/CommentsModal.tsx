@@ -12,9 +12,10 @@ interface Comment {
 interface ModalProps {
     comments: Comment[];
     isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+    threadId: string;
 }
 
-const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState }) => {
+const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }) => {
     const [isOpen, setIsOpen] = isOpenState;
     const [commentsWithNames, setCommentsWithNames] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState<string>("");
@@ -51,10 +52,24 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState }) => {
 
     const handleAddComment = async () => {
         if (newComment.trim() === "") return;
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error("User is not logged in.");
+            return;
+        }
+
         try {
-            // Add your logic to save the comment here, e.g., POST to the server
-            console.log("New comment submitted:", newComment);
-            setNewComment(""); // Clear input field after submission
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/comment`, {
+                threadId,
+                content: newComment,
+                token
+            });
+
+            if (response.data && response.data.thread) {
+                setCommentsWithNames(response.data.thread.comments);
+                setNewComment(""); // Clear input field after submission
+            }
         } catch (error) {
             console.error("Error adding comment:", error);
         }
@@ -82,16 +97,56 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState }) => {
                     {commentsWithNames.map((comment, index) => (
                         <div
                             key={`${comment.userId}-${index}`}
-                            className="flex flex-col bg-gray-100 hover:bg-gray-200 transition p-3 rounded-lg shadow-sm mb-2"
+                            className="flex flex-col bg-gray-100 transition p-3 rounded-lg shadow-sm mb-2"
                         >
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-800 font-medium">{comment.userName}</span>
-                                <div className="flex space-x-2">
-                                    <span className="text-green-600 font-bold">Upvotes: {comment.upvotes.length}</span>
-                                    <span className="text-red-600 font-bold">Downvotes: {comment.downvotes.length}</span>
-                                </div>
                             </div>
                             <p className="text-gray-700 mt-2">{comment.content}</p>
+                            <div className="flex items-center justify-between p-1">
+                                <div className="flex items-center space-x-4">
+                                    <div>
+                                        <button
+                                            // onClick={() => handleUpvote(stateThread._id)}
+                                            // disabled={stateThread.upvotes.includes(userId)}
+                                            className={`py-1 px-3 rounded-md border ${
+                                                false
+                                                    ? "bg-blue-500 text-white"
+                                                    : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
+                                            }`}
+                                    >
+                                        ▲
+                                        </button>
+                                        <button
+                                            // onClick={handleOpenUpvoteModal}
+                                            className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
+                                        >
+                                            {comment.upvotes.length}
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <button
+                                            // onClick={() => handleDownvote(stateThread._id)}
+                                            // disabled={stateThread.downvotes.includes(userId)}
+                                            className={`py-1 px-3 rounded-md border ${
+                                                // stateThread.downvotes.includes(userId)
+                                                false
+                                                ? "bg-red-500 text-white"
+                                                : "bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white"
+                                            }`}
+                                        >
+                                        ▼
+                                        </button>
+                                        <button
+                                            // onClick={handleOpenDownvoteModal}
+                                            className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
+                                        >
+                                            {comment.downvotes.length}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     ))}
                     {commentsWithNames.length === 0 && (
