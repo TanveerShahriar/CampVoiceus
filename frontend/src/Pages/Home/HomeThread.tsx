@@ -70,7 +70,14 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
         };
         
         try {
-            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/upvote`, upvoteData);
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/upvote`, upvoteData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             const { updatedThread } = response.data;
 
             setStateThread(updatedThread);
@@ -87,7 +94,14 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
         };
         
         try {
-            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/downvote`, downvoteData);
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/downvote`, downvoteData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             const { updatedThread } = response.data;
 
             setStateThread(updatedThread);
