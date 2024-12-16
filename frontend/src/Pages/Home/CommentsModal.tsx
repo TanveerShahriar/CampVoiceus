@@ -94,7 +94,7 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }
             onClick={handleCloseModal}
         >
             <div
-                className="w-3/4 max-w-[900px] bg-white rounded-lg p-4 shadow-lg relative flex flex-col"
+                className="w-3/4 max-w-[900px] bg-white rounded-lg p-4 shadow-lg relative flex flex-col max-h-[90vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
@@ -118,41 +118,29 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }
                                 <div className="flex items-center space-x-4">
                                     <div>
                                         <button
-                                            // onClick={() => handleUpvote(stateThread._id)}
-                                            // disabled={stateThread.upvotes.includes(userId)}
                                             className={`py-1 px-3 rounded-md border ${
                                                 false
                                                     ? "bg-blue-500 text-white"
                                                     : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
                                             }`}
-                                    >
-                                        ▲
-                                        </button>
-                                        <button
-                                            // onClick={handleOpenUpvoteModal}
-                                            className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
                                         >
+                                            ▲
+                                        </button>
+                                        <button className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500">
                                             {comment.upvotes.length}
                                         </button>
                                     </div>
-
                                     <div>
                                         <button
-                                            // onClick={() => handleDownvote(stateThread._id)}
-                                            // disabled={stateThread.downvotes.includes(userId)}
                                             className={`py-1 px-3 rounded-md border ${
-                                                // stateThread.downvotes.includes(userId)
                                                 false
-                                                ? "bg-red-500 text-white"
-                                                : "bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white"
+                                                    ? "bg-red-500 text-white"
+                                                    : "bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white"
                                             }`}
                                         >
-                                        ▼
+                                            ▼
                                         </button>
-                                        <button
-                                            // onClick={handleOpenDownvoteModal}
-                                            className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500"
-                                        >
+                                        <button className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500">
                                             {comment.downvotes.length}
                                         </button>
                                     </div>
@@ -164,7 +152,7 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }
                         <p className="text-gray-600 text-center">No comments available.</p>
                     )}
                 </div>
-                <div className="flex items-center border-t pt-2 mt-4">
+                <div className="flex items-center border-t pt-2">
                     <input
                         type="text"
                         value={newComment}
