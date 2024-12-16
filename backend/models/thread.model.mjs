@@ -3,6 +3,7 @@ import { User } from './index.mjs'
 
 // Define the Comment schema
 const CommentSchema = new mongoose.Schema({
+  commentId: { type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
   userId: { type: String, required: true },
   content: { type: String, required: true },
   upvotes: { type: [String], default: [] }, // Array of userIds who upvoted the comment
