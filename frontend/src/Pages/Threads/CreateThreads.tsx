@@ -34,6 +34,7 @@ export default function CreateThreads() {
       await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/createthread`, threadData, {
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
       });
 

@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { ThreadController } from '../controllers/index.mjs';
+import { requireAuth } from '../middleware/requireAuth.mjs';
 
 const router = Router();
+
+router.use(requireAuth);
 
 router.post('/createthread', ThreadController.createThread);
 router.post('/homethreads', ThreadController.homeThreads);
