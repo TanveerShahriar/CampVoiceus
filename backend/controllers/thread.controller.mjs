@@ -29,6 +29,27 @@ export async function homeThreads(req, res) {
     }
 }
 
+export async function getThreadById(req, res){
+    try {
+        const { id } = req.body;
+        
+        if (!id) {
+          return res.status(400).json({ error: 'Thread ID is required' });
+        }
+    
+        const thread = await Thread.findById(id);
+    
+        if (!thread) {
+          return res.status(404).json({ error: 'Thread not found' });
+        }
+    
+        res.status(200).json({ thread });
+    } catch (error) {
+        console.error('Error fetching thread:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 export async function upvote(req, res) {
     const { upvoter, threadId } = req.body;
     

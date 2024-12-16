@@ -1,14 +1,24 @@
 import React from 'react';
 import HomeThread from './HomeThread';
 
+interface Comment {
+    commentId: string;
+    userId: string;
+    content: string;
+    upvotes: string[];
+    downvotes: string[];
+    userName: string;
+}
+
 interface Thread {
     _id: string;
     title: string;
     content: string;
     authorName: string;
+    comments: Comment[];
     upvotes: string[];
     downvotes: string[];
-};
+}
 
 interface HomeThreadsProps {
     threads: Thread[];

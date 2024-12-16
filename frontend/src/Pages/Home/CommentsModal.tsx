@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
 interface Comment {
+    commentId: string;
     userId: string;
     content: string;
     upvotes: string[];
@@ -10,12 +11,11 @@ interface Comment {
 }
 
 interface ModalProps {
-    comments: Comment[];
     isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
     threadId: string;
 }
 
-const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }) => {
+const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
     const [isOpen, setIsOpen] = isOpenState;
     const [commentsWithNames, setCommentsWithNames] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState<string>("");
@@ -23,6 +23,14 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }
     useEffect(() => {
         const fetchCommentUserNames = async () => {
             try {
+                const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/getthreadbyid`, { id : threadId }, {
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  });
+                
+                const comments: Comment[] = res.data.thread.comments;
+                
                 const updatedComments = await Promise.all(
                     comments.map(async (comment) => {
                         const response = await axios.post(
@@ -44,7 +52,7 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }
         };
 
         fetchCommentUserNames();
-    }, [comments]);
+    }, [commentsWithNames]);
 
     const handleCloseModal = () => {
         setIsOpen(false);
@@ -105,9 +113,9 @@ const CommentsModal: React.FC<ModalProps> = ({ comments, isOpenState, threadId }
                 </button>
                 <h2 className="text-xl font-semibold mb-4">Comments</h2>
                 <div className="flex-1 overflow-y-auto mb-4">
-                    {commentsWithNames.map((comment, index) => (
+                    {commentsWithNames.map((comment) => (
                         <div
-                            key={`${comment.userId}-${index}`}
+                            key={comment.commentId}
                             className="flex flex-col bg-gray-100 transition p-3 rounded-lg shadow-sm mb-2"
                         >
                             <div className="flex justify-between items-center">

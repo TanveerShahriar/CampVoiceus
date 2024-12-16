@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import CommentsModal from "./CommentsModal";
 
 interface Comment {
+    commentId: string;
     userId: string;
     content: string;
     upvotes: string[];
@@ -165,7 +166,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
                 }
 
                 {isOpenComment && 
-                    <CommentsModal comments={stateThread.comments} isOpenState={[isOpenComment, setIsOpenComment]} threadId={stateThread._id}></CommentsModal>
+                    <CommentsModal isOpenState={[isOpenComment, setIsOpenComment]} threadId={stateThread._id}></CommentsModal>
                 }
             </div>
         </div>
