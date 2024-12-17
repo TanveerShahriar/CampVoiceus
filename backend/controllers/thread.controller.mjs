@@ -204,7 +204,7 @@ export async function upvoteComment(req, res) {
         // Save the updated thread document
         await thread.save();
 
-        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: thread.comments });
+        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
     } catch (error) {
         console.error('Error upvoting comment:', error);
         return res.status(500).json({ message: 'Internal server error.' });
@@ -248,7 +248,7 @@ export async function downvoteComment(req, res) {
         // Save the updated thread document
         await thread.save();
 
-        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: thread.comments });
+        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
     } catch (error) {
         console.error('Error upvoting comment:', error);
         return res.status(500).json({ message: 'Internal server error.' });
