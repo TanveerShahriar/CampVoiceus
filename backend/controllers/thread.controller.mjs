@@ -184,16 +184,11 @@ export async function upvoteComment(req, res) {
             return res.status(404).json({ message: 'Thread not found.' });
         }
 
-        console.log('Thread found:', thread);
-        console.log('Searching for commentId:', commentId);
-
         // Locate the comment in the thread
         const comment = thread.comments.find((c) => c.commentId.equals(new mongoose.Types.ObjectId(commentId)));
         if (!comment) {
             return res.status(404).json({ message: 'Comment not found.' });
         }
-
-        console.log('Comment found:', comment);
 
         // Check if user has already upvoted the comment
         if (comment.upvotes.includes(userId)) {
@@ -209,7 +204,7 @@ export async function upvoteComment(req, res) {
         // Save the updated thread document
         await thread.save();
 
-        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
+        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: thread.comments });
     } catch (error) {
         console.error('Error upvoting comment:', error);
         return res.status(500).json({ message: 'Internal server error.' });
@@ -253,7 +248,7 @@ export async function downvoteComment(req, res) {
         // Save the updated thread document
         await thread.save();
 
-        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
+        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: thread.comments });
     } catch (error) {
         console.error('Error upvoting comment:', error);
         return res.status(500).json({ message: 'Internal server error.' });

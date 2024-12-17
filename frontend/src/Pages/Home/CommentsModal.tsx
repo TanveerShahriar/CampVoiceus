@@ -68,7 +68,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
         };
 
         fetchCommentUserNames();
-    }, [comments, commentsWithNames]);
+    }, [comments]);
 
     const handleCloseModal = () => {
         setIsOpen(false);
@@ -137,7 +137,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
             );
             const { updatedComment } = response.data;
 
-            setComments(updatedComment);
+            setComments(updatedComment);  
         } catch (err: any) {
             console.log("error");
         }
@@ -162,7 +162,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
             );
             const { updatedComment } = response.data;
 
-            setComments(updatedComment);
+            setComments(updatedComment);  
         } catch (err: any) {
             console.log("error");
         }
