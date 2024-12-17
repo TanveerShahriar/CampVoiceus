@@ -5,11 +5,22 @@ import { Thread } from '../models/index.mjs'
 export async function createThread(req, res) {
     try {
         const { title, content, author } = req.body;
+        const file = req.file;
 
         const decoded = jwt.verify(author, process.env.JWT_SECRET_KEY);
         const authorId = decoded.id;
+
+        const threadData = { title, content, authorId, };
     
-        const newThread = new Thread({ title, content, authorId });
+        if (file) {
+            threadData.file = {
+              name: file.originalname,
+              contentType: file.mimetype,
+              data: file.buffer,
+            };
+        }
+
+        const newThread = new Thread(threadData);
         await newThread.save();
     
         res.status(201).json({

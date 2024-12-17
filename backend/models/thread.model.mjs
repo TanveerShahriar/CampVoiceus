@@ -11,6 +11,14 @@ const CommentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+// Define the File schema
+const FileSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // File name
+  contentType: { type: String, required: true }, // File MIME type (e.g., 'image/png', 'application/pdf')
+  data: { type: Buffer, required: true }, // File content as Buffer
+  uploadedAt: { type: Date, default: Date.now },
+});
+
 // Define the Thread schema
 const ThreadSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -20,6 +28,7 @@ const ThreadSchema = new mongoose.Schema({
   comments: { type: [CommentSchema], default: [] },
   upvotes: { type: [String], default: [] }, // Array of userIds who upvoted the thread
   downvotes: { type: [String], default: [] }, // Array of userIds who downvoted the thread
+  file: { type: FileSchema, required: false }, // Optional file field
   createdAt: { type: Date, default: Date.now },
 });
 
