@@ -2,15 +2,26 @@ import axios from "axios";
 import React, { useEffect, useState } from 'react';
 import VotesModal from "./VotesModal";
 import { jwtDecode } from "jwt-decode";
+import CommentsModal from "./CommentsModal";
+
+interface Comment {
+    commentId: string;
+    userId: string;
+    content: string;
+    upvotes: string[];
+    downvotes: string[];
+    userName: string;
+}
 
 interface Thread {
     _id: string;
     title: string;
     content: string;
     authorName: string;
+    comments: Comment[];
     upvotes: string[];
     downvotes: string[];
-};
+}
 
 interface HomeThreadProps {
     thread: Thread;
@@ -25,6 +36,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
     const [stateThread, setStateThread] = useState<Thread>(thread);
     const [isOpenUpvote, setIsOpenUpvote] = useState<boolean>(false);
     const [isOpenDownvote, setIsOpenDownvote] = useState<boolean>(false);
+    const [isOpenComment, setIsOpenComment] = useState<boolean>(false);
     const [userId, setUserId] = useState<string>("");
 
     useEffect(() => {
@@ -46,6 +58,10 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
         setIsOpenDownvote(true);
     };
 
+    const handleOpenCommentModal = () => {
+        setIsOpenComment(true);
+    };
+
     const handleUpvote = async (threadId : string) => {
         const token = localStorage.getItem('token');
         const upvoteData = {
@@ -54,7 +70,14 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
         };
         
         try {
-            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/upvote`, upvoteData);
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/upvote`, upvoteData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             const { updatedThread } = response.data;
 
             setStateThread(updatedThread);
@@ -71,7 +94,14 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
         };
         
         try {
-            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/downvote`, downvoteData);
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/downvote`, downvoteData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             const { updatedThread } = response.data;
 
             setStateThread(updatedThread);
@@ -134,6 +164,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
                     </div>
 
                     <button
+                        onClick={handleOpenCommentModal}
                         className="py-1 px-4 rounded-md border bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white"
                     >
                         Comment
@@ -146,6 +177,10 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
 
                 {isOpenDownvote && 
                     <VotesModal voteType="Downvotes" votes={stateThread.downvotes} isOpenState={[isOpenDownvote, setIsOpenDownvote]}></VotesModal>
+                }
+
+                {isOpenComment && 
+                    <CommentsModal isOpenState={[isOpenComment, setIsOpenComment]} threadId={stateThread._id}></CommentsModal>
                 }
             </div>
         </div>

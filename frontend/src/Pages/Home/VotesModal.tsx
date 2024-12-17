@@ -19,11 +19,13 @@ const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
   useEffect(() => {
     const fetchVoterNames = async () => {
       try {
+        const token = localStorage.getItem("token");
         const voterData = await Promise.all(
           votes.map(async (id) => {
             const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/getuserbyid`, {id}, {
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
               },
             });
             return { id, name: response.data.name };
@@ -50,18 +52,9 @@ const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
       onClick={handleCloseModal}
     >
       <div
-        className="w-3/4 max-w-[900px] bg-white rounded-lg p-4 shadow-lg relative"
+        className="w-3/4 max-w-[900px] bg-white rounded-lg p-4 shadow-lg relative flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-semibold">{voteType}</h2>
-        {voters.map((voter) => (
-          <div
-            key={voter.id}
-            className="flex items-center bg-gray-100 hover:bg-gray-200 transition p-3 rounded-lg shadow-sm"
-          >
-            <span className="text-gray-800 font-medium">{voter.name}</span>
-          </div>
-        ))}
         <button
           onClick={handleCloseModal}
           className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors duration-200 text-3xl font-bold"
@@ -69,6 +62,18 @@ const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
         >
           &times;
         </button>
+
+        <h2 className="text-xl font-semibold mb-4">{voteType}</h2>
+        <div className="flex-1 overflow-y-auto">
+          {voters.map((voter) => (
+            <div
+              key={voter.id}
+              className="flex items-center bg-gray-100 hover:bg-gray-200 transition p-3 rounded-lg shadow-sm mb-2"
+            >
+              <span className="text-gray-800 font-medium">{voter.name}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
