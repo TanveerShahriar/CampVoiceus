@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import CommentsVotingModal from './CommentsVotingModal';
 
 interface Comment {
     commentId: string;
@@ -17,8 +18,20 @@ interface ModalProps {
 
 const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
     const [isOpen, setIsOpen] = isOpenState;
+    const [comments, setComments] = useState<Comment[]>([]);
     const [commentsWithNames, setCommentsWithNames] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState<string>("");
+
+    const [isOpenUpvote, setIsOpenUpvote] = useState<boolean>(false);
+    const [isOpenDownvote, setIsOpenDownvote] = useState<boolean>(false);
+
+    const handleOpenUpvoteModal = () => {
+        setIsOpenUpvote(true);
+    };
+
+    const handleOpenDownvoteModal = () => {
+        setIsOpenDownvote(true);
+    };
 
     useEffect(() => {
         const fetchCommentUserNames = async () => {
@@ -31,7 +44,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                     },
                   });
                 
-                const comments: Comment[] = res.data.thread.comments;
+                  setComments(res.data.thread.comments);
                 
                 const updatedComments = await Promise.all(
                     comments.map(async (comment) => {
@@ -55,7 +68,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
         };
 
         fetchCommentUserNames();
-    }, [commentsWithNames]);
+    }, [comments, commentsWithNames]);
 
     const handleCloseModal = () => {
         setIsOpen(false);
@@ -105,6 +118,56 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
         }
     };
 
+    const handleUpvote = async (commentId : string) => {
+        const token = localStorage.getItem('token');
+        const upvoteData = {
+            upvoter : token, // Set the authorId from JWT
+            threadId,
+            commentId
+        };
+        
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/upvotecomment`, upvoteData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            const { updatedComment } = response.data;
+
+            setComments(updatedComment);
+        } catch (err: any) {
+            console.log("error");
+        }
+    };
+
+    const handleDownvote = async (commentId : string) => {
+        const token = localStorage.getItem('token');
+        const downvoteData = {
+            downvoter : token, // Set the authorId from JWT
+            threadId,
+            commentId
+        };
+        
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/downvotecomment`, downvoteData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            const { updatedComment } = response.data;
+
+            setComments(updatedComment);
+        } catch (err: any) {
+            console.log("error");
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -137,6 +200,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                                 <div className="flex items-center space-x-4">
                                     <div>
                                         <button
+                                            onClick={() => handleUpvote(comment.commentId)}
                                             className={`py-1 px-3 rounded-md border ${
                                                 false
                                                     ? "bg-blue-500 text-white"
@@ -145,12 +209,13 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                                         >
                                             ▲
                                         </button>
-                                        <button className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500">
+                                        <button onClick={handleOpenUpvoteModal} className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500">
                                             {comment.upvotes.length}
                                         </button>
                                     </div>
                                     <div>
                                         <button
+                                            onClick={() => handleDownvote(comment.commentId)}
                                             className={`py-1 px-3 rounded-md border ${
                                                 false
                                                     ? "bg-red-500 text-white"
@@ -159,11 +224,18 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                                         >
                                             ▼
                                         </button>
-                                        <button className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500">
+                                        <button onClick={handleOpenDownvoteModal} className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500">
                                             {comment.downvotes.length}
                                         </button>
                                     </div>
                                 </div>
+                                {isOpenUpvote && 
+                                    <CommentsVotingModal voteType="Upvotes" votes={comment.upvotes} isOpenState={[isOpenUpvote, setIsOpenUpvote]}></CommentsVotingModal>
+                                }
+
+                                {isOpenDownvote && 
+                                    <CommentsVotingModal voteType="Downvotes" votes={comment.downvotes} isOpenState={[isOpenDownvote, setIsOpenDownvote]}></CommentsVotingModal>
+                                }
                             </div>
                         </div>
                     ))}

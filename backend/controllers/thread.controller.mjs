@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { Thread } from '../models/index.mjs'
 
 export async function createThread(req, res) {
@@ -163,5 +164,98 @@ export async function comment(req, res) {
             return res.status(401).json({ error: 'Invalid token.' });
         }
         return res.status(500).json({ error: 'Internal server error.' });
+    }
+};
+
+export async function upvoteComment(req, res) {
+    const { upvoter, threadId, commentId } = req.body;
+
+    const decoded = jwt.verify(upvoter, process.env.JWT_SECRET_KEY);
+    const userId = decoded.id;
+
+    if (!userId || !threadId || !commentId) {
+        return res.status(400).json({ message: 'userId, threadId, and commentId are required.' });
+    }
+
+    try {
+        // Find the thread containing the comment
+        const thread = await Thread.findById(threadId);
+        if (!thread) {
+            return res.status(404).json({ message: 'Thread not found.' });
+        }
+
+        console.log('Thread found:', thread);
+        console.log('Searching for commentId:', commentId);
+
+        // Locate the comment in the thread
+        const comment = thread.comments.find((c) => c.commentId.equals(new mongoose.Types.ObjectId(commentId)));
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found.' });
+        }
+
+        console.log('Comment found:', comment);
+
+        // Check if user has already upvoted the comment
+        if (comment.upvotes.includes(userId)) {
+            return res.status(400).json({ message: 'You have already upvoted this comment.' });
+        }
+
+        // Remove userId from downvotes if present
+        comment.downvotes = comment.downvotes.filter((id) => id !== userId);
+
+        // Add userId to upvotes
+        comment.upvotes.push(userId);
+
+        // Save the updated thread document
+        await thread.save();
+
+        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
+    } catch (error) {
+        console.error('Error upvoting comment:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
+export async function downvoteComment(req, res) {
+    const { downvoter, threadId, commentId } = req.body;
+
+    const decoded = jwt.verify(downvoter, process.env.JWT_SECRET_KEY);
+    const userId = decoded.id;
+
+    if (!userId || !threadId || !commentId) {
+        return res.status(400).json({ message: 'userId, threadId, and commentId are required.' });
+    }
+
+    try {
+        // Find the thread containing the comment
+        const thread = await Thread.findById(threadId);
+        if (!thread) {
+            return res.status(404).json({ message: 'Thread not found.' });
+        }
+
+        // Locate the comment in the thread
+        const comment = thread.comments.find((c) => c.commentId.equals(new mongoose.Types.ObjectId(commentId)));
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found.' });
+        }
+
+        // Check if user has already downvoted the comment
+        if (comment.downvotes.includes(userId)) {
+            return res.status(400).json({ message: 'You have already downvoted this comment.' });
+        }
+
+        // Remove userId from upvotes if present
+        comment.upvotes = comment.upvotes.filter((id) => id !== userId);
+
+        // Add userId to upvotes
+        comment.downvotes.push(userId);
+
+        // Save the updated thread document
+        await thread.save();
+
+        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
+    } catch (error) {
+        console.error('Error upvoting comment:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
     }
 };
