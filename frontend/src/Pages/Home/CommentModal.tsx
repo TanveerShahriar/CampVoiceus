@@ -1,6 +1,7 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CommentsVotingModal from './CommentsVotingModal';
+import { jwtDecode } from 'jwt-decode';
 
 interface Comment {
     commentId: string;
@@ -14,6 +15,11 @@ interface Comment {
 interface CommentProps {
     comment: Comment;
     threadId: string;
+}
+
+interface DecodedToken {
+    id: string;
+    email: string;
 }
 
 async function getName(userId: string, token: string|null): Promise<string> {
@@ -34,6 +40,18 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
     const [stateComment, setStateComment] = useState<Comment>(comment);
     const [isOpenUpvote, setIsOpenUpvote] = useState<boolean>(false);
     const [isOpenDownvote, setIsOpenDownvote] = useState<boolean>(false);
+    const [userId, setUserId] = useState<string>("");
+
+    useEffect(() => {
+            const token = localStorage.getItem('token');
+    
+            if (token) {
+                const decoded: DecodedToken = jwtDecode(token);
+                setUserId(decoded.id);
+            } else {
+                console.error("No token found");
+            }
+    }, []);
 
     const handleOpenUpvoteModal = () => {
         setIsOpenUpvote(true);
@@ -108,8 +126,9 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
                     <div>
                         <button
                             onClick={() => handleUpvote(stateComment.commentId)}
+                            disabled={stateComment.upvotes.includes(userId)}
                             className={`py-1 px-3 rounded-md border ${
-                                false
+                                stateComment.upvotes.includes(userId)
                                     ? "bg-blue-500 text-white"
                                     : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
                             }`}
@@ -123,8 +142,9 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
                     <div>
                         <button
                             onClick={() => handleDownvote(stateComment.commentId)}
+                            disabled={stateComment.downvotes.includes(userId)}
                             className={`py-1 px-3 rounded-md border ${
-                                false
+                                stateComment.downvotes.includes(userId)
                                     ? "bg-red-500 text-white"
                                     : "bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white"
                             }`}
