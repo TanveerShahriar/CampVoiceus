@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/index.mjs';
+import validator from 'validator';
 
 const generateToken = (user) => {
     return jwt.sign(
@@ -15,9 +16,9 @@ export async function welcome(req, res) {
 
 export async function registerUser(req, res) {
     try {
-        const { name, email, password } = req.body;
+        const { name, username, email, password } = req.body;
   
-        if (!name || !email || !password) {
+        if (!name || !username || !email || !password) {
             return res.status(400).json({ error: 'All fields are required' });
         }
     
@@ -28,7 +29,7 @@ export async function registerUser(req, res) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
     
-        const newUser = new User({ name, email, password : hashedPassword });
+        const newUser = new User({ name, username, email, password : hashedPassword });
         await newUser.save();
     
         res.status(201).json({
@@ -41,12 +42,20 @@ export async function registerUser(req, res) {
 }
 
 export async function loginUser(req, res){
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
+
+    if (!identifier || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }    
   
     try {
-        const user = await User.findOne({ email });
+        const isEmail = validator.isEmail(identifier);
+        const user = isEmail
+            ? await User.findOne({ email: identifier })
+            : await User.findOne({ username: identifier });
+
         if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            throw new Error("Invalid email or username");
         }
     
         const isMatch = await bcrypt.compare(password, user.password);

@@ -6,6 +6,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+    },
     email: {
         type: String,
         required: true,
@@ -24,6 +30,17 @@ const userSchema = new mongoose.Schema({
         required: true,
         minlength: 8,
     },
+    
+    avaterUrl: {
+        type: String,
+        required: false,
+    },
+
+    bio: {
+        type: String,
+        required: false,
+    },
+
     createdAt: {
         type: Date,
         default: Date.now,

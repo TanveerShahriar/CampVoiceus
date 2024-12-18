@@ -7,18 +7,21 @@ const Register: React.FC = () => {
 
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
   });
 
   const [errors, setErrors] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
   });
 
   // Using useRef to reference form fields
   const nameRef = useRef<HTMLInputElement | null>(null);
+  const usernameRef = useRef<HTMLInputElement | null>(null);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
@@ -32,12 +35,17 @@ const Register: React.FC = () => {
 
   const validateForm = (): boolean => {
     let valid = true;
-    let errorMessages = { name: '', email: '', password: '' };
+    let errorMessages = { name: '', username: '', email: '', password: '' };
 
     if (!formData.name) {
       valid = false;
       errorMessages.name = 'Name is required';
       nameRef.current?.focus(); // Focus on name input if there's an error
+    }
+    if (!formData.username) {
+      valid = false;
+      errorMessages.username = 'Username is required';
+      usernameRef.current?.focus(); // Focus on username input if there's an error
     }
     if (!formData.email) {
       valid = false;
@@ -103,6 +111,22 @@ const Register: React.FC = () => {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
           {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            Username
+          </label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleInputChange}
+            ref={usernameRef}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
         </div>
 
         <div className="mb-4">
