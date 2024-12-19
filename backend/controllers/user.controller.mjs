@@ -2,6 +2,11 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/index.mjs';
 import validator from 'validator';
+import multer from "multer";
+import cloudinary from '../config/cloudinary.mjs';
+import dotevn from 'dotenv';
+
+dotevn.config();
 
 const generateToken = (user) => {
     return jwt.sign(
@@ -92,3 +97,105 @@ export async function getUserById(req, res){
         res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+
+export const getUserByToken = async (req, res) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Authorization header missing or invalid' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    console.log('Token:', token);
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        console.log('Decoded token:', decoded);
+
+        const user = await User.findById(decoded.id).select('-password'); 
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+        res.status(500).json({ error: 'An error occurred while fetching user data' });
+    }
+};
+
+
+export const getUserByUsername = async (req, res) => {
+    const { username } = req.params;
+
+    try {
+        const user = await User.findOne({ username }).select('-password'); // Exclude password for security
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred while fetching user data' });
+    }
+};
+
+
+
+
+// Multer setup
+const upload = multer({ storage: multer.memoryStorage() }); // Temporary memory storage
+
+export const updateUserByUsername = async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const { name, bio } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    let avatarUrl = null;
+
+    // Process the image upload
+    if (req.file) {
+      const uploadPromise = new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "campV_profile_dps" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result.secure_url);
+          }
+        );
+
+        stream.end(req.file.buffer);
+      });
+
+      avatarUrl = await uploadPromise;
+    }
+
+    // Update user fields
+    const updateFields = { name, bio };
+    if (avatarUrl) updateFields.avatarUrl = avatarUrl;
+
+    const user = await User.findByIdAndUpdate(
+      decoded.id,
+      updateFields,
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      name: user.name,
+      bio: user.bio,
+      avatarUrl: user.avatarUrl,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "An error occurred while updating user data" });
+  }
+};

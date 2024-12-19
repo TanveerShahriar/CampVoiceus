@@ -5,6 +5,9 @@ import Register from "./Pages/Login/Register";
 import Login from "./Pages/Login/Login";
 import RequireAuth from "./Pages/Login/RequireAuth";
 import CreateThreads from "./Pages/Threads/CreateThreads";
+import Dashboard from "./Pages/Profile/DashBoard";
+import ViewProfile from "./Pages/Profile/ViewProfile";
+import ProfileEdit from "./Pages/Profile/ProfileEdit";
 
 export default function App() {
   return (
@@ -12,30 +15,52 @@ export default function App() {
       <Header></Header>
 
       <Routes>
-        <Route path='/' element={
+        <Route
+          path="/"
+          element={
             <RequireAuth>
               <Home></Home>
             </RequireAuth>
-          }>
-        </Route>
+          }
+        ></Route>
 
-        <Route path='/createthread' element={
+        <Route
+          path="/createthread"
+          element={
             <RequireAuth>
               <CreateThreads></CreateThreads>
             </RequireAuth>
-          }>
-        </Route>
+          }
+        ></Route>
 
-        <Route path='/register' element={
-            <Register></Register>
-          }>
-        </Route>
+        <Route path="/register" element={<Register></Register>}></Route>
 
-        <Route path='/login' element={
-            <Login></Login>
-          }>
-        </Route>
+        <Route path="/login" element={<Login></Login>}></Route>
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <Dashboard></Dashboard>
+            </RequireAuth>
+          }
+        ></Route>
+        <Route
+          path="/profile/view/:username"
+          element={
+            <RequireAuth>
+              <ViewProfile></ViewProfile>
+            </RequireAuth>
+          }
+        ></Route>
+        <Route
+          path="/profile/edit"
+          element={
+            <RequireAuth>
+              <ProfileEdit></ProfileEdit>
+            </RequireAuth>
+          }
+        ></Route>
       </Routes>
     </div>
-  )
+  );
 }

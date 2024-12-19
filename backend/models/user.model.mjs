@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
         minlength: 8,
     },
     
-    avaterUrl: {
+    avatarUrl: {
         type: String,
         required: false,
     },
