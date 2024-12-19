@@ -6,17 +6,17 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '',
     password: '',
   });
 
   const [errors, setErrors] = useState({
-    email: '',
+    identifier: '',
     password: '',
   });
 
   // Using useRef to reference form fields
-  const emailRef = useRef<HTMLInputElement | null>(null);
+  const identifierRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,16 +29,12 @@ const Login: React.FC = () => {
 
   const validateForm = (): boolean => {
     let valid = true;
-    let errorMessages = { email: '', password: '' };
+    let errorMessages = { identifier: '', password: '' };
 
-    if (!formData.email) {
+    if (!formData.identifier) {
       valid = false;
-      errorMessages.email = 'Email is required';
-      emailRef.current?.focus(); // Focus on email input if there's an error
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      valid = false;
-      errorMessages.email = 'Email is invalid';
-      emailRef.current?.focus(); // Focus on email input if it's invalid
+      errorMessages.identifier = 'Email/Username is required';
+      identifierRef.current?.focus(); // Focus on identifier input if there's an error
     }
     if (!formData.password) {
       valid = false;
@@ -79,19 +75,19 @@ const Login: React.FC = () => {
       <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
       <form onSubmit={handleLogin}>
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
+          <label htmlFor="identifier" className="block text-sm font-medium text-gray-700">
+            Email/Username
           </label>
           <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+            type="identifier"
+            id="identifier"
+            name="identifier"
+            value={formData.identifier}
             onChange={handleInputChange}
-            ref={emailRef}
+            ref={identifierRef}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+          {errors.identifier && <p className="text-red-500 text-xs mt-1">{errors.identifier}</p>}
         </div>
 
         <div className="mb-6">
