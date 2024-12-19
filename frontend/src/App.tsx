@@ -45,7 +45,7 @@ export default function App() {
           }
         ></Route>
         <Route
-          path="/profile/view/:username"
+          path="/profile/:username"
           element={
             <RequireAuth>
               <ViewProfile></ViewProfile>
