@@ -165,3 +165,17 @@ export async function comment(req, res) {
         return res.status(500).json({ error: 'Internal server error.' });
     }
 };
+
+
+export async function getUserThreads(req, res) {
+    console.log("getUserThreads triggered, User ID:", req.params.userId);
+    const { userId } = req.params;
+
+    try {
+        const threads = await Thread.find({ authorId: userId }).sort({ createdAt: -1 });
+        res.status(200).json(threads);
+    } catch (error) {
+        console.error('Error fetching user threads:', error);
+        res.status(500).json({ error: 'An error occurred while fetching user threads' });
+    }
+}
