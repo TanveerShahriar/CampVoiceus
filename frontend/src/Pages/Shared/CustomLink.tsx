@@ -1,31 +1,28 @@
-import React, { ReactNode } from 'react';
-import { Link, useMatch, useResolvedPath } from 'react-router-dom';
+import { ReactNode } from 'react';
+import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
 interface CustomLinkProps {
-  children?: ReactNode;
+  children: ReactNode;
   to: string;
-  [key: string]: any;
+  className?: string;
+  icon?: ReactNode;
 }
 
-const CustomLink: React.FC<CustomLinkProps> = ({ children, to, ...props }) => {
-  const resolved = useResolvedPath(to);
-  const match = useMatch({ path: resolved.pathname, end: true });
+export default function CustomLink({ children, to, className, icon, ...props }: CustomLinkProps) {
+  const resolvedPath = useResolvedPath(to);
+  const isActive = useMatch({ path: resolvedPath.pathname, end: true });
 
   return (
-    <div>
-      <Link
-        to={to}
-        {...props}
-        className={`text-lg font-semibold px-4 py-2 rounded-md ${
-          match
-            ? 'bg-white text-indigo-600'
-            : 'text-white hover:bg-indigo-700 transition'
-        }`}
-      >
-        {children}
-      </Link>
-    </div>
+    <Link
+      to={to}
+      className={`${className ? className : 'text-indigo-200 hover:bg-indigo-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium'} ${
+        isActive ? 'bg-indigo-700 text-white' : ''
+      } flex items-center`}
+      {...props}
+    >
+      {icon}
+      {children}
+    </Link>
   );
-};
+}
 
-export default CustomLink;
