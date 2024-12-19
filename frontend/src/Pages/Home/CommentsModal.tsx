@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import CommentModal from './CommentModal';
 
 interface Comment {
     commentId: string;
@@ -17,6 +18,7 @@ interface ModalProps {
 
 const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
     const [isOpen, setIsOpen] = isOpenState;
+    const [comments, setComments] = useState<Comment[]>([]);
     const [commentsWithNames, setCommentsWithNames] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState<string>("");
 
@@ -31,7 +33,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                     },
                   });
                 
-                const comments: Comment[] = res.data.thread.comments;
+                  setComments(res.data.thread.comments);
                 
                 const updatedComments = await Promise.all(
                     comments.map(async (comment) => {
@@ -55,7 +57,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
         };
 
         fetchCommentUserNames();
-    }, [commentsWithNames]);
+    }, [comments]);
 
     const handleCloseModal = () => {
         setIsOpen(false);
@@ -125,47 +127,7 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                 <h2 className="text-xl font-semibold mb-4">Comments</h2>
                 <div className="flex-1 overflow-y-auto mb-4">
                     {commentsWithNames.map((comment) => (
-                        <div
-                            key={comment.commentId}
-                            className="flex flex-col bg-gray-100 transition p-3 rounded-lg shadow-sm mb-2"
-                        >
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-800 font-medium">{comment.userName}</span>
-                            </div>
-                            <p className="text-gray-700 mt-2">{comment.content}</p>
-                            <div className="flex items-center justify-between p-1">
-                                <div className="flex items-center space-x-4">
-                                    <div>
-                                        <button
-                                            className={`py-1 px-3 rounded-md border ${
-                                                false
-                                                    ? "bg-blue-500 text-white"
-                                                    : "bg-gray-200 text-gray-700 hover:bg-blue-500 hover:text-white"
-                                            }`}
-                                        >
-                                            ▲
-                                        </button>
-                                        <button className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500">
-                                            {comment.upvotes.length}
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <button
-                                            className={`py-1 px-3 rounded-md border ${
-                                                false
-                                                    ? "bg-red-500 text-white"
-                                                    : "bg-gray-200 text-gray-700 hover:bg-red-500 hover:text-white"
-                                            }`}
-                                        >
-                                            ▼
-                                        </button>
-                                        <button className="py-1 px-3 rounded-md text-gray-700 hover:text-blue-500">
-                                            {comment.downvotes.length}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <CommentModal key={comment.commentId} comment={comment} threadId={threadId}></CommentModal>
                     ))}
                     {commentsWithNames.length === 0 && (
                         <p className="text-gray-600 text-center">No comments available.</p>

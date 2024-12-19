@@ -5,15 +5,29 @@ export default function CreateThreads() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
+    file: null,
   });
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, files, type } = e.target as HTMLInputElement;
+    if (type === "file" && files) {
+      // Handle file input
+      setFile(files[0]);
+      setFormData({ ...formData, [name]: files[0] });
+    } else {
+      // Handle other inputs (text, textarea, etc.)
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    (document.getElementById("file") as HTMLInputElement).value = ""; // Reset input field
   };
 
   // Handle form submission
@@ -30,16 +44,19 @@ export default function CreateThreads() {
         author: token, // Set the authorId from JWT
       };
 
+      console.log(threadData);
+      
+
       // Post data to the backend
       await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/createthread`, threadData, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
 
       setSuccess(true);
-      setFormData({ title: "", content: "" });
+      setFormData({ title: "", content: "", file: null });
     } catch (err) {
       console.error(err);
       setError("Failed to create the thread. Please try again.");
@@ -84,6 +101,39 @@ export default function CreateThreads() {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             required
           />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="file" className="block text-sm font-medium text-gray-700">
+              File Upload
+          </label>
+          <div className="relative mt-1 flex items-center">
+            <input
+                id="file"
+                name="file"
+                type="file"
+                onChange={handleInputChange}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
+                file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold 
+                file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            />
+            {file && (
+              <button
+                  type="button"
+                  onClick={clearFile}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-red-500 focus:outline-none"
+                  aria-label="Clear file"
+              >
+                  &#x2715; {/* Cross Icon */}
+              </button>
+            )}
+          </div>
+          {file && (
+              <p className="mt-2 text-sm text-gray-600">
+                  Selected File: <span className="font-medium">{file.name}</span>
+              </p>
+            )}
         </div>
 
         <button
