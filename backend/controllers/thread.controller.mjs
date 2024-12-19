@@ -168,7 +168,6 @@ export async function comment(req, res) {
 
 
 export async function getUserThreads(req, res) {
-    console.log("getUserThreads triggered, User ID:", req.params.userId);
     const { userId } = req.params;
 
     try {
