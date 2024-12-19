@@ -3,6 +3,12 @@ import axios from "axios";
 import CreateThread from "./CreateThread";
 import HomeThreads from "./HomeThreads";
 
+interface File {
+    name: string;
+    contentType: string;
+    data: ArrayBuffer;
+}
+
 interface Comment {
     commentId: string;
     userId: string;
@@ -20,6 +26,7 @@ interface Thread {
     comments: Comment[];
     upvotes: string[];
     downvotes: string[];
+    file?: File;
 }
 
 export default function Home() {

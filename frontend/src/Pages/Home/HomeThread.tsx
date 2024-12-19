@@ -4,6 +4,12 @@ import VotesModal from "./VotesModal";
 import { jwtDecode } from "jwt-decode";
 import CommentsModal from "./CommentsModal";
 
+interface File {
+    name: string;
+    contentType: string;
+    data: ArrayBuffer;
+}
+
 interface Comment {
     commentId: string;
     userId: string;
@@ -21,6 +27,7 @@ interface Thread {
     comments: Comment[];
     upvotes: string[];
     downvotes: string[];
+    file?: File;
 }
 
 interface HomeThreadProps {
@@ -109,6 +116,37 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
             console.log("error");
         }
     };
+
+    const handleFileDownload = async (threadId : string) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post(
+                `${import.meta.env.VITE_SERVER_URL}/threads/filedownload`,
+                { threadId },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Replace jwtToken with your actual token variable
+                    },
+                    responseType: 'blob',
+                }
+            );
+            const file = response.data;
+            
+            const blob = new Blob([file], { type: response.headers['content-type'] });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            if (stateThread?.file?.name) { 
+                link.download = stateThread.file.name;
+            } else {
+                link.download = "resource";
+            }
+            link.click();
+        } catch (error) {
+            console.error(error);
+            alert('Failed to download file!');
+        }
+    }
+
     return (
         <div>
             <div className="p-6 bg-gray-100 rounded-md shadow-md">
@@ -119,6 +157,22 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
                     By: {stateThread.authorName || "Unknown"}
                 </p>
                 <p className="text-gray-700 mb-4">{stateThread.content}</p>
+
+                {stateThread.file ? (
+                    <div className="my-4 p-4 border rounded-md bg-gray-50 shadow-sm">
+                        <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-indigo-700">Attachment: {stateThread.file.name}</p>
+                            <button
+                                onClick={() => handleFileDownload(stateThread._id)}
+                                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                            >
+                                Download File
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <p></p>
+                )}
 
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">

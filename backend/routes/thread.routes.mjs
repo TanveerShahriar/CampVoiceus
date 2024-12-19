@@ -15,5 +15,6 @@ router.post('/downvote', ThreadController.downvote);
 router.post('/comment', ThreadController.comment);
 router.post('/upvotecomment', ThreadController.upvoteComment);
 router.post('/downvotecomment', ThreadController.downvoteComment);
+router.post('/filedownload', ThreadController.fileDownload);
 
 export default router;

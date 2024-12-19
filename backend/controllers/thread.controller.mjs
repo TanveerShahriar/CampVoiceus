@@ -62,6 +62,23 @@ export async function getThreadById(req, res){
     }
 }
 
+export async function fileDownload(req, res) {
+    try {
+        const { threadId } = req.body;
+        
+        const thread = await Thread.findById(threadId);
+        const file = thread.file;
+        if (!file) return res.status(404).json({ error: 'File not found' });
+        res.set({
+            'Content-Type': file.contentType,
+            'Content-Disposition': `attachment; filename="${file.name}"`,
+        });
+        res.send(file.data);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to download file' });
+    }
+};
+
 export async function upvote(req, res) {
     const { upvoter, threadId } = req.body;
     

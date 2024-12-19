@@ -1,6 +1,12 @@
 import React from 'react';
 import HomeThread from './HomeThread';
 
+interface File {
+    name: string;
+    contentType: string;
+    data: ArrayBuffer;
+}
+
 interface Comment {
     commentId: string;
     userId: string;
@@ -18,6 +24,7 @@ interface Thread {
     comments: Comment[];
     upvotes: string[];
     downvotes: string[];
+    file?: File;
 }
 
 interface HomeThreadsProps {
