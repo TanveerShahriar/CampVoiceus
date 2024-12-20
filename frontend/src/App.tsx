@@ -8,6 +8,8 @@ import CreateThreads from "./Pages/Threads/CreateThreads";
 import Dashboard from "./Pages/Profile/DashBoard";
 import ViewProfile from "./Pages/Profile/ViewProfile";
 import ProfileEdit from "./Pages/Profile/ProfileEdit";
+import CommunityCalendar from "./Pages/Calendar/CommunityCalendar";
+import CreateEvent from "./Pages/Calendar/CreateEvent";
 
 export default function App() {
   return (
@@ -57,6 +59,22 @@ export default function App() {
           element={
             <RequireAuth>
               <ProfileEdit></ProfileEdit>
+            </RequireAuth>
+          }
+        ></Route>
+        <Route
+          path="/calendar"
+          element={
+            <RequireAuth>
+              <CommunityCalendar></CommunityCalendar>
+            </RequireAuth>
+          }
+        ></Route>
+        <Route
+          path="/calendar/create"
+          element={
+            <RequireAuth>
+              <CreateEvent></CreateEvent>
             </RequireAuth>
           }
         ></Route>

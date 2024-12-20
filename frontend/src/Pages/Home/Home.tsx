@@ -57,7 +57,7 @@ export default function Home() {
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg">
             <CreateThread></CreateThread>
-
+            
             <HomeThreads threads={threads}></HomeThreads>
         </div>
     );

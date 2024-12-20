@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Menu, X, Home, User, PlusSquare, LogOut } from 'lucide-react';
+import { Menu, X, Home, User, PlusSquare, LogOut, Calendar } from 'lucide-react';
 import CustomLink from "./CustomLink";
 
 export default function Header() {
@@ -34,6 +34,11 @@ export default function Header() {
                   <>
                     <CustomLink to="/dashboard" icon={<User className="w-5 h-5 mr-1" />}>Profile</CustomLink>
                     <CustomLink to="/createthread" icon={<PlusSquare className="w-5 h-5 mr-1" />}>Create Thread</CustomLink>
+                    {location.pathname === "/calendar" ? (
+                      <CustomLink to="/calendar/create" icon={<PlusSquare className="w-5 h-5 mr-1" />}>Create Event</CustomLink>
+                    ) : (
+                      <CustomLink to="/calendar" icon={<Calendar className="w-5 h-5 mr-1" />}>Explore Events</CustomLink>
+                    )}
                   </>
                 )}
               </div>
@@ -79,8 +84,13 @@ export default function Header() {
             <CustomLink to="/" className="text-white block px-3 py-2 rounded-md text-base font-medium" icon={<Home className="w-5 h-5 mr-1" />}>Home</CustomLink>
             {isLoggedIn && (
               <>
-                <CustomLink to="/profile" className="text-white block px-3 py-2 rounded-md text-base font-medium" icon={<User className="w-5 h-5 mr-1" />}>Profile</CustomLink>
-                <CustomLink to="/create-thread" className="text-white block px-3 py-2 rounded-md text-base font-medium" icon={<PlusSquare className="w-5 h-5 mr-1" />}>Create Thread</CustomLink>
+                <CustomLink to="/dashboard" className="text-white block px-3 py-2 rounded-md text-base font-medium" icon={<User className="w-5 h-5 mr-1" />}>Profile</CustomLink>
+                <CustomLink to="/createthread" className="text-white block px-3 py-2 rounded-md text-base font-medium" icon={<PlusSquare className="w-5 h-5 mr-1" />}>Create Thread</CustomLink>
+                {location.pathname === "/calendar" ? (
+                  <CustomLink to="/calendar/create" className="text-white block px-3 py-2 rounded-md text-base font-medium" icon={<PlusSquare className="w-5 h-5 mr-1" />}>Create Event</CustomLink>
+                ) : (
+                  <CustomLink to="/calendar" className="text-white block px-3 py-2 rounded-md text-base font-medium" icon={<Calendar className="w-5 h-5 mr-1" />}>Explore Events</CustomLink>
+                )}
               </>
             )}
             {isLoggedIn ? (
@@ -103,4 +113,3 @@ export default function Header() {
     </nav>
   );
 }
-
