@@ -88,3 +88,18 @@ export const rsvpEvent = async (req, res) => {
     }
   };
   
+
+  export const getMyEvents = async (req, res) => {
+    const userId = req.user._id;
+  
+    try {
+      const myEvents = await Event.find({ attendees: userId }).populate(
+        "createdBy",
+        "name username"
+      );
+      res.status(200).json(myEvents);
+    } catch (error) {
+      console.error("Error fetching my events:", error);
+      res.status(500).json({ error: "Internal server error." });
+    }
+  };

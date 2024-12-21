@@ -19,7 +19,8 @@ export default function Header() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const showCreateThread = location.pathname !== "/calendar";
+  // Exclude `Create Thread` on `/calendar`, `/myevents`, and `/createevent` pages
+  const showCreateThread = !["/calendar", "/myevents", "/createevent"].includes(location.pathname);
   const showExploreAndCreateEvent = location.pathname === "/myevents";
 
   return (
