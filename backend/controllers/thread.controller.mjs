@@ -4,10 +4,15 @@ import { Thread } from '../models/index.mjs'
 
 export async function createThread(req, res) {
     try {
-        const { title, content, author } = req.body;
+        const { title, content } = req.body;
         const file = req.file;
 
-        const decoded = jwt.verify(author, process.env.JWT_SECRET_KEY);
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ error: "Token missing" });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const authorId = decoded.id;
 
         const threadData = { title, content, authorId, };
@@ -27,7 +32,7 @@ export async function createThread(req, res) {
             message: 'Thread registered successfully',
         });
         } catch (error) {
-            console.error('Error in registerUser:', error);
+            console.error('Error in createThread:', error);
             res.status(500).json({ error: 'Internal server error' });
     }
 }
