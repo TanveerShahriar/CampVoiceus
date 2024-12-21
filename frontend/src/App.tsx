@@ -10,6 +10,10 @@ import ViewProfile from "./Pages/Profile/ViewProfile";
 import ProfileEdit from "./Pages/Profile/ProfileEdit";
 import CommunityCalendar from "./Pages/Calendar/CommunityCalendar";
 import CreateEvent from "./Pages/Calendar/CreateEvent";
+import MyEvents from "./Pages/Calendar/MyEvents";
+import 'react-calendar/dist/Calendar.css';
+
+
 
 export default function App() {
   return (
@@ -78,6 +82,14 @@ export default function App() {
             </RequireAuth>
           }
         ></Route>
+        <Route
+          path="/myevents"
+          element={
+            <RequireAuth>
+              <MyEvents />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </div>
   );
