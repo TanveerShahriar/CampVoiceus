@@ -125,28 +125,52 @@ export default function Header() {
             </CustomLink>
             {isLoggedIn && (
               <>
-                <CustomLink to="/dashboard" className="block text-white px-3 py-2 rounded-md text-base font-medium" icon={<User className="w-5 h-5 mr-1" />}>
+                <CustomLink
+                  to="/dashboard"
+                  className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                  icon={<User className="w-5 h-5 mr-1" />}
+                >
                   Profile
                 </CustomLink>
                 {showCreateThread && (
-                  <CustomLink to="/createthread" className="block text-white px-3 py-2 rounded-md text-base font-medium" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
+                  <CustomLink
+                    to="/createthread"
+                    className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                    icon={<PlusSquare className="w-5 h-5 mr-1" />}
+                  >
                     Create Thread
                   </CustomLink>
                 )}
                 {isCreateEventPage && (
-                  <CustomLink to="/calendar" className="block text-white px-3 py-2 rounded-md text-base font-medium" icon={<Calendar className="w-5 h-5 mr-1" />}>
+                  <CustomLink
+                    to="/calendar"
+                    className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                    icon={<Calendar className="w-5 h-5 mr-1" />}
+                  >
                     Explore Events
                   </CustomLink>
                 )}
-                <CustomLink to="/myevents" className="block text-white px-3 py-2 rounded-md text-base font-medium" icon={<Calendar className="w-5 h-5 mr-1" />}>
+                <CustomLink
+                  to="/myevents"
+                  className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                  icon={<Calendar className="w-5 h-5 mr-1" />}
+                >
                   My Events
                 </CustomLink>
                 {showExploreAndCreateEvent && (
                   <>
-                    <CustomLink to="/calendar" className="block text-white px-3 py-2 rounded-md text-base font-medium" icon={<Calendar className="w-5 h-5 mr-1" />}>
+                    <CustomLink
+                      to="/calendar"
+                      className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                      icon={<Calendar className="w-5 h-5 mr-1" />}
+                    >
                       Explore Events
                     </CustomLink>
-                    <CustomLink to="/calendar/create" className="block text-white px-3 py-2 rounded-md text-base font-medium" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
+                    <CustomLink
+                      to="/calendar/create"
+                      className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                      icon={<PlusSquare className="w-5 h-5 mr-1" />}
+                    >
                       Create Event
                     </CustomLink>
                   </>
