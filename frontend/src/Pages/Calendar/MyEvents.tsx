@@ -32,10 +32,10 @@ const MyEvents: React.FC = () => {
         alert("Please log in to view your events.");
         return;
       }
-  
+
       try {
         const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/events/myevents`, {
-          headers: { Authorization: `Bearer ${token}` }, // Ensure token is passed here
+          headers: { Authorization: `Bearer ${token}` },
         });
         setEvents(response.data);
       } catch (error) {
@@ -47,10 +47,9 @@ const MyEvents: React.FC = () => {
         }
       }
     };
-  
+
     fetchMyEvents();
   }, []);
-  
 
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
@@ -71,17 +70,29 @@ const MyEvents: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">My Events</h1>
-      <Calendar
-        onClickDay={handleDateClick}
-        tileContent={({ date }) => {
-          const hasEvent = events.some(
-            (event) => new Date(event.date).toDateString() === date.toDateString()
-          );
-          return hasEvent ? <div className="bg-blue-500 rounded-full w-2 h-2 mx-auto"></div> : null;
-        }}
-      />
+    <div className="w-screen h-screen flex flex-col items-center bg-gray-100">
+      <h1 className="text-2xl font-bold my-4">My Events</h1>
+      <div className="flex-grow w-full flex justify-center items-center">
+        <Calendar
+          className="w-full max-w-4xl mx-auto p-0"
+          onClickDay={handleDateClick}
+          tileContent={({ date }) => {
+            const dateEvents = events.filter(
+              (event) => new Date(event.date).toDateString() === date.toDateString()
+            );
+
+            return (
+              <div>
+                {dateEvents.map((event) => (
+                  <p key={event._id} className="text-sm text-blue-700 truncate">
+                    {event.title}
+                  </p>
+                ))}
+              </div>
+            );
+          }}
+        />
+      </div>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-96 relative">
@@ -95,15 +106,17 @@ const MyEvents: React.FC = () => {
               Events on {selectedDate?.toLocaleDateString()}
             </h2>
             {selectedDateEvents.length > 0 ? (
-              selectedDateEvents.map((event) => (
+              selectedDateEvents.map((event, index) => (
                 <div
                   key={event._id}
                   className="p-4 mb-4 border rounded-md bg-gray-50"
                 >
-                  <h3 className="font-semibold">{event.title}</h3>
-                  <p>{event.description}</p>
+                  <p className="font-medium">Event {index + 1}</p>
+                  <p className="font-semibold">Time: {new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                  <p className="font-semibold">Title: {event.title}</p>
+                  <p>Description: {event.description}</p>
                   <p className="text-sm text-gray-600">
-                    {event.location.hallName}, {event.location.houseNo}, {event.location.roadNo},{" "}
+                    Location: {event.location.hallName}, {event.location.houseNo}, {event.location.roadNo},{" "}
                     {event.location.areaName}, {event.location.thana},{" "}
                     {event.location.district}.
                   </p>

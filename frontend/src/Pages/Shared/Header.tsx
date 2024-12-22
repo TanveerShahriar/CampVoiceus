@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Menu, X, Home, User, PlusSquare, LogOut, Calendar } from 'lucide-react';
+import { Menu, X, Home, User, PlusSquare, LogOut, Calendar } from "lucide-react";
 import CustomLink from "./CustomLink";
 
 export default function Header() {
@@ -10,7 +10,7 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate('/login');
+    navigate("/login");
   };
 
   const isLoggedIn = location.pathname !== "/login" && location.pathname !== "/register";
@@ -19,8 +19,10 @@ export default function Header() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Exclude `Create Thread` on `/calendar`, `/myevents`, and `/createevent` pages
-  const showCreateThread = !["/calendar", "/myevents", "/createevent"].includes(location.pathname);
+  const isCreateEventPage = location.pathname === "/calendar/create";
+  const showCreateThread =
+    !["/calendar", "/myevents", "/calendar/create"].includes(location.pathname) &&
+    !isCreateEventPage;
   const showExploreAndCreateEvent = location.pathname === "/myevents";
 
   return (
@@ -33,13 +35,22 @@ export default function Header() {
             </Link>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <CustomLink to="/" icon={<Home className="w-5 h-5 mr-1" />}>Home</CustomLink>
+                <CustomLink to="/" icon={<Home className="w-5 h-5 mr-1" />}>
+                  Home
+                </CustomLink>
                 {isLoggedIn && (
                   <>
-                    <CustomLink to="/dashboard" icon={<User className="w-5 h-5 mr-1" />}>Profile</CustomLink>
+                    <CustomLink to="/dashboard" icon={<User className="w-5 h-5 mr-1" />}>
+                      Profile
+                    </CustomLink>
                     {showCreateThread && (
                       <CustomLink to="/createthread" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
                         Create Thread
+                      </CustomLink>
+                    )}
+                    {isCreateEventPage && (
+                      <CustomLink to="/calendar" icon={<Calendar className="w-5 h-5 mr-1" />}>
+                        Explore Events
                       </CustomLink>
                     )}
                     <CustomLink to="/myevents" icon={<Calendar className="w-5 h-5 mr-1" />}>
@@ -50,7 +61,10 @@ export default function Header() {
                         <CustomLink to="/calendar" icon={<Calendar className="w-5 h-5 mr-1" />}>
                           Explore Events
                         </CustomLink>
-                        <CustomLink to="/calendar/create" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
+                        <CustomLink
+                          to="/calendar/create"
+                          icon={<PlusSquare className="w-5 h-5 mr-1" />}
+                        >
                           Create Event
                         </CustomLink>
                       </>
@@ -72,10 +86,16 @@ export default function Header() {
                 </button>
               ) : (
                 <>
-                  <CustomLink to="/register" className="text-white bg-indigo-700 hover:bg-indigo-800 px-3 py-2 rounded-md text-sm font-medium mr-2">
+                  <CustomLink
+                    to="/register"
+                    className="text-white bg-indigo-700 hover:bg-indigo-800 px-3 py-2 rounded-md text-sm font-medium mr-2"
+                  >
                     Register
                   </CustomLink>
-                  <CustomLink to="/login" className="text-white bg-indigo-700 hover:bg-indigo-800 px-3 py-2 rounded-md text-sm font-medium">
+                  <CustomLink
+                    to="/login"
+                    className="text-white bg-indigo-700 hover:bg-indigo-800 px-3 py-2 rounded-md text-sm font-medium"
+                  >
                     Login
                   </CustomLink>
                 </>
