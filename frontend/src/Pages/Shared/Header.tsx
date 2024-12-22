@@ -125,6 +125,7 @@ export default function Header() {
             </CustomLink>
             {isLoggedIn && (
               <>
+
                 <CustomLink
                   to="/dashboard"
                   className="block text-white px-3 py-2 rounded-md text-base font-medium"
@@ -175,6 +176,7 @@ export default function Header() {
                     </CustomLink>
                   </>
                 )}
+                
               </>
             )}
             {isLoggedIn ? (
