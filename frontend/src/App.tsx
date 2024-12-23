@@ -11,9 +11,11 @@ import ProfileEdit from "./Pages/Profile/ProfileEdit";
 import CommunityCalendar from "./Pages/Calendar/CommunityCalendar";
 import CreateEvent from "./Pages/Calendar/CreateEvent";
 import MyEvents from "./Pages/Calendar/MyEvents";
+import CreateGroup from "./Pages/Groups/CreateGroup";
+import ShowAllGroups from "./Pages/Groups/ShowAllGroups";
+import MyGroups from "./Pages/Groups/MyGroups";
+import GroupChat from "./Pages/Groups/GroupChat";
 import 'react-calendar/dist/Calendar.css';
-
-
 
 export default function App() {
   return (
@@ -21,72 +23,113 @@ export default function App() {
       <Header></Header>
 
       <Routes>
+        {/* Auth Routes */}
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        {/* Home Route */}
         <Route
           path="/"
           element={
             <RequireAuth>
-              <Home></Home>
+              <Home />
             </RequireAuth>
           }
-        ></Route>
+        />
 
+        {/* Thread Routes */}
         <Route
           path="/createthread"
           element={
             <RequireAuth>
-              <CreateThreads></CreateThreads>
+              <CreateThreads />
             </RequireAuth>
           }
-        ></Route>
+        />
 
-        <Route path="/register" element={<Register></Register>}></Route>
+        
 
-        <Route path="/login" element={<Login></Login>}></Route>
+        {/* Profile Routes */}
         <Route
           path="/dashboard"
           element={
             <RequireAuth>
-              <Dashboard></Dashboard>
+              <Dashboard />
             </RequireAuth>
           }
-        ></Route>
+        />
         <Route
           path="/profile/:username"
           element={
             <RequireAuth>
-              <ViewProfile></ViewProfile>
+              <ViewProfile />
             </RequireAuth>
           }
-        ></Route>
+        />
         <Route
           path="/profile/edit"
           element={
             <RequireAuth>
-              <ProfileEdit></ProfileEdit>
+              <ProfileEdit />
             </RequireAuth>
           }
-        ></Route>
+        />
+
+        {/* Calendar Routes */}
         <Route
           path="/calendar"
           element={
             <RequireAuth>
-              <CommunityCalendar></CommunityCalendar>
+              <CommunityCalendar />
             </RequireAuth>
           }
-        ></Route>
+        />
         <Route
           path="/calendar/create"
           element={
             <RequireAuth>
-              <CreateEvent></CreateEvent>
+              <CreateEvent />
             </RequireAuth>
           }
-        ></Route>
+        />
         <Route
           path="/myevents"
           element={
             <RequireAuth>
               <MyEvents />
+            </RequireAuth>
+          }
+        />
+
+        {/* Group Management Routes */}
+        <Route
+          path="/groups/create"
+          element={
+            <RequireAuth>
+              <CreateGroup />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/groups"
+          element={
+            <RequireAuth>
+              <ShowAllGroups />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/groups/mine"
+          element={
+            <RequireAuth>
+              <MyGroups />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/groups/chat/:groupId"
+          element={
+            <RequireAuth>
+              <GroupChat />
             </RequireAuth>
           }
         />

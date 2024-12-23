@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Menu, X, Home, User, PlusSquare, LogOut, Calendar } from "lucide-react";
+import { Menu, X, Home, User, PlusSquare, LogOut, Calendar, Users } from "lucide-react";
 import CustomLink from "./CustomLink";
 
 export default function Header() {
@@ -19,11 +19,22 @@ export default function Header() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const isCreateEventPage = location.pathname === "/calendar/create";
+  // Determine which buttons to show based on location
+  const isMyGroupsPage = location.pathname === "/groups/mine";
+  const isAllGroupsPage = location.pathname === "/groups";
+  const isCreateGroupPage = location.pathname === "/groups/create";
+
   const showCreateThread =
-    !["/calendar", "/myevents", "/calendar/create"].includes(location.pathname) &&
-    !isCreateEventPage;
-  const showExploreAndCreateEvent = location.pathname === "/myevents";
+    ![
+      "/calendar",
+      "/myevents",
+      "/calendar/create",
+      "/mygroups",
+      "/allgroups",
+      "/creategroup",
+    ].includes(location.pathname);
+
+  const showEventButtons = location.pathname === "/myevents";
 
   return (
     <nav className="bg-indigo-600 shadow-lg mb-2">
@@ -48,15 +59,47 @@ export default function Header() {
                         Create Thread
                       </CustomLink>
                     )}
-                    {isCreateEventPage && (
-                      <CustomLink to="/calendar" icon={<Calendar className="w-5 h-5 mr-1" />}>
-                        Explore Events
-                      </CustomLink>
-                    )}
+                    {/* My Events Button */}
                     <CustomLink to="/myevents" icon={<Calendar className="w-5 h-5 mr-1" />}>
                       My Events
                     </CustomLink>
-                    {showExploreAndCreateEvent && (
+                    {/* My Groups Button */}
+                    <CustomLink to="/groups/mine" icon={<Users className="w-5 h-5 mr-1" />}>
+                      My Groups
+                    </CustomLink>
+                    {/* Conditional Group Buttons */}
+                    {isMyGroupsPage && (
+                      <>
+                        <CustomLink to="/groups/create" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
+                          Create Group
+                        </CustomLink>
+                        <CustomLink to="/groups" icon={<Users className="w-5 h-5 mr-1" />}>
+                          All Groups
+                        </CustomLink>
+                      </>
+                    )}
+                    {isAllGroupsPage && (
+                      <>
+                        <CustomLink to="/groups/mine" icon={<Users className="w-5 h-5 mr-1" />}>
+                          My Groups
+                        </CustomLink>
+                        <CustomLink to="/groups/create" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
+                          Create Group
+                        </CustomLink>
+                      </>
+                    )}
+                    {isCreateGroupPage && (
+                      <>
+                        <CustomLink to="/groups/mine" icon={<Users className="w-5 h-5 mr-1" />}>
+                          My Groups
+                        </CustomLink>
+                        <CustomLink to="/groups" icon={<Users className="w-5 h-5 mr-1" />}>
+                          All Groups
+                        </CustomLink>
+                      </>
+                    )}
+                    {/* Conditional Event Buttons */}
+                    {showEventButtons && (
                       <>
                         <CustomLink to="/calendar" icon={<Calendar className="w-5 h-5 mr-1" />}>
                           Explore Events
@@ -120,12 +163,15 @@ export default function Header() {
       {isMenuOpen && (
         <div className="md:hidden bg-indigo-600">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <CustomLink to="/" className="block text-white px-3 py-2 rounded-md text-base font-medium" icon={<Home className="w-5 h-5 mr-1" />}>
+            <CustomLink
+              to="/"
+              className="block text-white px-3 py-2 rounded-md text-base font-medium"
+              icon={<Home className="w-5 h-5 mr-1" />}
+            >
               Home
             </CustomLink>
             {isLoggedIn && (
               <>
-
                 <CustomLink
                   to="/dashboard"
                   className="block text-white px-3 py-2 rounded-md text-base font-medium"
@@ -142,15 +188,6 @@ export default function Header() {
                     Create Thread
                   </CustomLink>
                 )}
-                {isCreateEventPage && (
-                  <CustomLink
-                    to="/calendar"
-                    className="block text-white px-3 py-2 rounded-md text-base font-medium"
-                    icon={<Calendar className="w-5 h-5 mr-1" />}
-                  >
-                    Explore Events
-                  </CustomLink>
-                )}
                 <CustomLink
                   to="/myevents"
                   className="block text-white px-3 py-2 rounded-md text-base font-medium"
@@ -158,48 +195,12 @@ export default function Header() {
                 >
                   My Events
                 </CustomLink>
-                {showExploreAndCreateEvent && (
-                  <>
-                    <CustomLink
-                      to="/calendar"
-                      className="block text-white px-3 py-2 rounded-md text-base font-medium"
-                      icon={<Calendar className="w-5 h-5 mr-1" />}
-                    >
-                      Explore Events
-                    </CustomLink>
-                    <CustomLink
-                      to="/calendar/create"
-                      className="block text-white px-3 py-2 rounded-md text-base font-medium"
-                      icon={<PlusSquare className="w-5 h-5 mr-1" />}
-                    >
-                      Create Event
-                    </CustomLink>
-                  </>
-                )}
-                
-              </>
-            )}
-            {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="block text-left w-full text-white px-3 py-2 rounded-md text-base font-medium bg-indigo-700 hover:bg-indigo-800"
-              >
-                <LogOut className="w-5 h-5 mr-1 inline" />
-                Logout
-              </button>
-            ) : (
-              <>
                 <CustomLink
-                  to="/register"
-                  className="block text-white px-3 py-2 rounded-md text-base font-medium bg-indigo-700 hover:bg-indigo-800"
+                  to="/groups/mine"
+                  className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                  icon={<Users className="w-5 h-5 mr-1" />}
                 >
-                  Register
-                </CustomLink>
-                <CustomLink
-                  to="/login"
-                  className="block text-white px-3 py-2 rounded-md text-base font-medium bg-indigo-700 hover:bg-indigo-800"
-                >
-                  Login
+                  My Groups
                 </CustomLink>
               </>
             )}
