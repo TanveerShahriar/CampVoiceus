@@ -5,7 +5,14 @@ interface Event {
     _id: string;
     title: string;
     description: string;
-    location: string;
+    location: {
+        hallName: String,
+        houseNo: String,
+        roadNo: String,
+        areaName: String,
+        thana: String,
+        district: String,
+    };
     date: string; // ISO string from the backend
     attendees: string[];
 }
