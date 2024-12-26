@@ -64,7 +64,6 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
     const handleUpvote = async (commentId : string) => {
             const token = localStorage.getItem('token');
             const upvoteData = {
-                upvoter : token, // Set the authorId from JWT
                 threadId,
                 commentId
             };
@@ -90,7 +89,6 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
         const handleDownvote = async (commentId : string) => {
             const token = localStorage.getItem('token');
             const downvoteData = {
-                downvoter : token, // Set the authorId from JWT
                 threadId,
                 commentId
             };

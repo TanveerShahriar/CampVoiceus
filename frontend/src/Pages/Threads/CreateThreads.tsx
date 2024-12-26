@@ -41,7 +41,6 @@ export default function CreateThreads() {
 
       const threadData = {
         ...formData,
-        author: token, // Set the authorId from JWT
       };
 
       console.log(threadData);
