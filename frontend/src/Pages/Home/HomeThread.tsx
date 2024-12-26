@@ -108,7 +108,6 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
     const handleUpvote = async (threadId : string) => {
         const token = localStorage.getItem('token');
         const upvoteData = {
-            upvoter : token,
             threadId
         };
         
@@ -135,7 +134,6 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
     const handleDownvote = async (threadId : string) => {
         const token = localStorage.getItem('token');
         const downvoteData = {
-            downvoter : token,
             threadId
         };
         
