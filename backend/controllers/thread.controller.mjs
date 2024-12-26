@@ -85,9 +85,14 @@ export async function fileDownload(req, res) {
 };
 
 export async function upvote(req, res) {
-    const { upvoter, threadId } = req.body;
+    const { threadId } = req.body;
+
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
     
-    const decoded = jwt.verify(upvoter, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const upvoterId = decoded.id;
 
     if (!upvoterId) {
@@ -119,9 +124,14 @@ export async function upvote(req, res) {
 }
 
 export async function downvote(req, res) {
-    const { downvoter, threadId } = req.body;
+    const { threadId } = req.body;
+
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
     
-    const decoded = jwt.verify(downvoter, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const downvoterId = decoded.id;
 
     if (!downvoterId) {
@@ -153,10 +163,15 @@ export async function downvote(req, res) {
 }
 
 export async function comment(req, res) {
-    const { threadId, content, token } = req.body;
+    const { threadId, content } = req.body;
 
-    if (!threadId || !content || !token) {
-        return res.status(400).json({ error: 'Thread ID, content, and token are required.' });
+    if (!threadId || !content) {
+        return res.status(400).json({ error: 'Thread ID and content are required.' });
+    }
+
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
     }
 
     try {
@@ -212,14 +227,24 @@ export async function getUserThreads(req, res) {
         res.status(500).json({ error: 'An error occurred while fetching user threads' });
     }
 }
-export async function upvoteComment(req, res) {
-    const { upvoter, threadId, commentId } = req.body;
 
-    const decoded = jwt.verify(upvoter, process.env.JWT_SECRET_KEY);
+export async function upvoteComment(req, res) {
+    const { threadId, commentId } = req.body;
+
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const userId = decoded.id;
 
-    if (!userId || !threadId || !commentId) {
-        return res.status(400).json({ message: 'userId, threadId, and commentId are required.' });
+    if (!userId) {
+        return res.status(400).json({ error: 'User name is required for upvoting' });
+    }
+
+    if (!threadId || !commentId) {
+        return res.status(400).json({ message: 'threadId, and commentId are required.' });
     }
 
     try {
@@ -257,13 +282,22 @@ export async function upvoteComment(req, res) {
 };
 
 export async function downvoteComment(req, res) {
-    const { downvoter, threadId, commentId } = req.body;
+    const { threadId, commentId } = req.body;
 
-    const decoded = jwt.verify(downvoter, process.env.JWT_SECRET_KEY);
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const userId = decoded.id;
 
-    if (!userId || !threadId || !commentId) {
-        return res.status(400).json({ message: 'userId, threadId, and commentId are required.' });
+    if (!userId) {
+        return res.status(400).json({ error: 'User name is required for upvoting' });
+    }
+
+    if (!threadId || !commentId) {
+        return res.status(400).json({ message: 'threadId, and commentId are required.' });
     }
 
     try {
