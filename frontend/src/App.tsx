@@ -12,21 +12,21 @@ import CommunityCalendar from "./Pages/Calendar/CommunityCalendar";
 import CreateEvent from "./Pages/Calendar/CreateEvent";
 import MyEvents from "./Pages/Calendar/MyEvents";
 import CreateGroup from "./Pages/Groups/CreateGroup";
-import ShowAllGroups from "./Pages/Groups/ShowAllGroups";
+import ShowAllGroups from "./Pages/Groups/AllGroups";
 import MyGroups from "./Pages/Groups/MyGroups";
-import GroupChat from "./Pages/Groups/GroupChat";
+import GroupPosts from "./Pages/Groups/GroupPosts";
 import 'react-calendar/dist/Calendar.css';
+import CreatePost from "./Pages/Groups/CreatePost";
 
 export default function App() {
   return (
     <div>
-      <Header></Header>
+      <Header />
 
       <Routes>
-        {/* Auth Routes */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        {/* Home Route */}
+
         <Route
           path="/"
           element={
@@ -36,7 +36,6 @@ export default function App() {
           }
         />
 
-        {/* Thread Routes */}
         <Route
           path="/createthread"
           element={
@@ -46,9 +45,6 @@ export default function App() {
           }
         />
 
-        
-
-        {/* Profile Routes */}
         <Route
           path="/dashboard"
           element={
@@ -74,7 +70,6 @@ export default function App() {
           }
         />
 
-        {/* Calendar Routes */}
         <Route
           path="/calendar"
           element={
@@ -100,7 +95,6 @@ export default function App() {
           }
         />
 
-        {/* Group Management Routes */}
         <Route
           path="/groups/create"
           element={
@@ -126,13 +120,21 @@ export default function App() {
           }
         />
         <Route
-          path="/groups/chat/:groupId"
+          path="/groups/:groupId"
           element={
             <RequireAuth>
-              <GroupChat />
+              <GroupPosts />
             </RequireAuth>
           }
         />
+        <Route
+    path="/groups/:groupId/createpost"
+    element={
+      <RequireAuth>
+        <CreatePost />
+      </RequireAuth>
+    }
+  />
       </Routes>
     </div>
   );

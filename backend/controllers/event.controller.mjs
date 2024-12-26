@@ -90,7 +90,8 @@ export const rsvpEvent = async (req, res) => {
   
 
   export const getMyEvents = async (req, res) => {
-    const userId = req.user._id;
+    
+    const userId = req.user.id;
   
     try {
       const myEvents = await Event.find({ attendees: userId }).populate(

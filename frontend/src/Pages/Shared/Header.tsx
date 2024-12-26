@@ -19,22 +19,21 @@ export default function Header() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Determine which buttons to show based on location
+  // Determine the current page for conditional rendering
   const isMyGroupsPage = location.pathname === "/groups/mine";
   const isAllGroupsPage = location.pathname === "/groups";
   const isCreateGroupPage = location.pathname === "/groups/create";
+  const isMyEventsPage = location.pathname === "/myevents";
 
   const showCreateThread =
     ![
       "/calendar",
       "/myevents",
       "/calendar/create",
-      "/mygroups",
-      "/allgroups",
-      "/creategroup",
+      "/groups/mine",
+      "/groups",
+      "/groups/create",
     ].includes(location.pathname);
-
-  const showEventButtons = location.pathname === "/myevents";
 
   return (
     <nav className="bg-indigo-600 shadow-lg mb-2">
@@ -59,15 +58,27 @@ export default function Header() {
                         Create Thread
                       </CustomLink>
                     )}
-                    {/* My Events Button */}
+                    {/* Event Buttons */}
                     <CustomLink to="/myevents" icon={<Calendar className="w-5 h-5 mr-1" />}>
                       My Events
                     </CustomLink>
-                    {/* My Groups Button */}
+                    {isMyEventsPage && (
+                      <>
+                        <CustomLink to="/calendar" icon={<Calendar className="w-5 h-5 mr-1" />}>
+                          Explore Events
+                        </CustomLink>
+                        <CustomLink
+                          to="/calendar/create"
+                          icon={<PlusSquare className="w-5 h-5 mr-1" />}
+                        >
+                          Create Event
+                        </CustomLink>
+                      </>
+                    )}
+                    {/* Group Buttons */}
                     <CustomLink to="/groups/mine" icon={<Users className="w-5 h-5 mr-1" />}>
                       My Groups
                     </CustomLink>
-                    {/* Conditional Group Buttons */}
                     {isMyGroupsPage && (
                       <>
                         <CustomLink to="/groups/create" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
@@ -95,20 +106,6 @@ export default function Header() {
                         </CustomLink>
                         <CustomLink to="/groups" icon={<Users className="w-5 h-5 mr-1" />}>
                           All Groups
-                        </CustomLink>
-                      </>
-                    )}
-                    {/* Conditional Event Buttons */}
-                    {showEventButtons && (
-                      <>
-                        <CustomLink to="/calendar" icon={<Calendar className="w-5 h-5 mr-1" />}>
-                          Explore Events
-                        </CustomLink>
-                        <CustomLink
-                          to="/calendar/create"
-                          icon={<PlusSquare className="w-5 h-5 mr-1" />}
-                        >
-                          Create Event
                         </CustomLink>
                       </>
                     )}

@@ -1,30 +1,34 @@
 import mongoose from "mongoose";
 
-const groupSchema = new mongoose.Schema({
+const GroupSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  description: { type: String },
+  description: { type: String, required: true },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  members: [
-    {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      role: { type: String, enum: ["Leader", "Member"], default: "Member" },
-    },
-  ],
-  messages: [
-    {
-      sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      content: { type: String, required: true },
-      timestamp: { type: Date, default: Date.now },
-    },
-  ],
-  updates: [
-    {
-      content: { type: String, required: true },
-      author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      timestamp: { type: Date, default: Date.now },
-    },
-  ],
+  members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model("Group", groupSchema);
+const PostSchema = new mongoose.Schema(
+  {
+    group: { type: mongoose.Schema.Types.ObjectId, ref: "Group", required: true },
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    comments: [
+      {
+        content: { type: String, required: true },
+        author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+        downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
+const Group = mongoose.model("Group", GroupSchema);
+const Post = mongoose.model("Post", PostSchema);
+
+export { Group, Post };

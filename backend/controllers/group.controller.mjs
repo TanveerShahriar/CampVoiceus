@@ -1,146 +1,240 @@
-// controllers/group.controller.mjs
-import Group from "../models/group.model.mjs";
-import Task from "../models/task.model.mjs";
+import { Group, Post } from "../models/group.model.mjs";
+import User from "../models/user.model.mjs";
 
-// Create a group
 export const createGroup = async (req, res) => {
   const { name, description } = req.body;
+  const creatorId = req.user.id; // Ensure `requireAuth` middleware attaches user ID
+
+  if (!name || !description) {
+    return res.status(400).json({ error: "Name and description are required" });
+  }
+
   try {
-    const newGroup = new Group({
-      name,
-      description,
-      createdBy: req.user._id,
-      members: [{ user: req.user._id, role: "Leader" }],
+    const group = new Group({
+      name : name,
+      description : description,
+      createdBy: creatorId,
+      members: [creatorId], // Add the creator as the first member
     });
-    await newGroup.save();
-    res.status(201).json(newGroup);
-  } catch (err) {
+
+    await group.save();
+    res.status(201).json(group);
+  } catch (error) {
+    console.error("Error creating group:", error);
     res.status(500).json({ error: "Failed to create group" });
   }
 };
 
-// Fetch all groups
+
 export const getAllGroups = async (req, res) => {
   try {
-    const groups = await Group.find().populate("createdBy", "name").populate("members.user", "name");
-    res.status(200).json(groups);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch groups" });
-  }
-};
+    const groups = await Group.find().populate("createdBy", "name username");
 
-// Fetch my groups
-export const getMyGroups = async (req, res) => {
-  try {
-    const myGroups = await Group.find({ "members.user": req.user._id }).populate("createdBy", "name");
-    res.status(200).json(myGroups);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch my groups" });
-  }
-};
-
-// Join a group
-export const joinGroup = async (req, res) => {
-  const { groupId } = req.params;
-  try {
-    const group = await Group.findById(groupId);
-    if (!group) return res.status(404).json({ error: "Group not found" });
-
-    if (!group.members.some((member) => member.user.equals(req.user._id))) {
-      group.members.push({ user: req.user._id, role: "Member" });
-      await group.save();
+    if (!groups.length) {
+      return res.status(404).json({ message: "No groups found." });
     }
 
-    res.status(200).json({ message: "Joined group successfully", group });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to join group" });
+    
+    res.status(200).json(groups);
+  } catch (error) {
+    console.error("Error fetching all groups:", error);
+    res.status(500).json({ error: "Failed to fetch groups." });
   }
 };
 
-// Send a message
-export const sendMessage = async (req, res) => {
+
+export const joinGroup = async (req, res) => {
   const { groupId } = req.params;
-  const { content } = req.body;
+  const userId = req.user._id;
 
   try {
     const group = await Group.findById(groupId);
-    if (!group) return res.status(404).json({ error: "Group not found" });
-
-    group.messages.push({ sender: req.user._id, content });
-    await group.save();
-
-    res.status(201).json({ message: "Message sent successfully", group });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to send message" });
+    if (!group.members.includes(userId)) {
+      group.members.push(userId);
+      await group.save();
+    }
+    res.status(200).json(group);
+  } catch (error) {
+    res.status(500).json({ error: "Error joining group." });
   }
 };
 
-// Fetch messages
-export const getMessages = async (req, res) => {
-  const { groupId } = req.params;
+
+export const leaveGroup = async (req, res) => {
   try {
-    const group = await Group.findById(groupId).populate("messages.sender", "name");
-    if (!group) return res.status(404).json({ error: "Group not found" });
+    const { groupId } = req.params;
+    const userId = req.user.id;
 
-    res.status(200).json(group.messages);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch messages" });
-  }
-};
-
-// Post an update
-export const postUpdate = async (req, res) => {
-  const { groupId } = req.params;
-  const { content } = req.body;
-
-  try {
+    // Find the group and remove the user from its members
     const group = await Group.findById(groupId);
-    if (!group) return res.status(404).json({ error: "Group not found" });
+    if (!group) {
+      return res.status(404).json({ error: "Group not found" });
+    }
 
-    group.updates.push({ content, author: req.user._id });
+    if (!group.members.includes(userId)) {
+      return res.status(400).json({ error: "You are not a member of this group" });
+    }
+
+    group.members = group.members.filter((member) => member.toString() !== userId);
     await group.save();
 
-    res.status(201).json({ message: "Update posted successfully", group });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to post update" });
+    res.status(200).json({ message: "Left the group successfully" });
+  } catch (error) {
+    console.error("Error leaving group:", error);
+    res.status(500).json({ error: "Failed to leave the group" });
   }
 };
 
-// Fetch updates
-export const getUpdates = async (req, res) => {
-  const { groupId } = req.params;
-  try {
-    const group = await Group.findById(groupId).populate("updates.author", "name");
-    if (!group) return res.status(404).json({ error: "Group not found" });
 
-    res.status(200).json(group.updates);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch updates" });
+
+
+export const createPost = async (req, res) => {
+  const { groupId } = req.params;
+  const { title, content } = req.body;
+  const userId = req.user.id; // Ensure `requireAuth` middleware attaches the user ID
+
+  if (!title || !content) {
+    return res.status(400).json({ error: "Title and content are required." });
+  }
+
+  try {
+    // Verify that the group exists
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ error: "Group not found." });
+    }
+    console.log("Group ID:", groupId);
+console.log("Request Body:", req.body);
+console.log("User ID:", userId);
+    // Create a new post
+    const post = new Post({
+      title,
+      content,
+      author: userId,
+      group: groupId,
+    });
+
+    await post.save();
+
+    res.status(201).json({ message: "Post created successfully.", post });
+  } catch (error) {
+    console.error("Error creating post:", error);
+    res.status(500).json({ error: "Failed to create post." });
   }
 };
 
-// Create a task
-export const createTask = async (req, res) => {
+
+export const getGroupPosts = async (req, res) => {
   const { groupId } = req.params;
-  const { title, description, assignedTo, dueDate } = req.body;
 
   try {
-    const task = new Task({ projectId: groupId, title, description, assignedTo, dueDate });
-    await task.save();
+    // Fetch all posts for the specified group
+    const posts = await Post.find({ group: groupId }).populate("author", "name username");
 
-    res.status(201).json({ message: "Task created successfully", task });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to create task" });
+    if (!posts.length) {
+      return res.status(404).json({ message: "No posts found for this group." });
+    }
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error("Error fetching group posts:", error);
+    res.status(500).json({ error: "Failed to fetch group posts." });
   }
 };
 
-// Fetch tasks
-export const getTasks = async (req, res) => {
-  const { groupId } = req.params;
+export const getPostDetails = async (req, res) => {
+  const { postId } = req.params;
+
   try {
-    const tasks = await Task.find({ projectId: groupId }).populate("assignedTo", "name");
-    res.status(200).json(tasks);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch tasks" });
+    const post = await Post.findById(postId)
+      .populate("author", "name username")
+      .populate("comments.author", "name username");
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching post details." });
+  }
+};
+
+export const interactWithPost = async (req, res) => {
+  const { postId } = req.params;
+  const { action, content } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const post = await Post.findById(postId);
+
+    if (action === "upvote") {
+      if (!post.upvotes.includes(userId)) {
+        post.upvotes.push(userId);
+        post.downvotes = post.downvotes.filter((id) => id.toString() !== userId.toString());
+      }
+    } else if (action === "downvote") {
+      if (!post.downvotes.includes(userId)) {
+        post.downvotes.push(userId);
+        post.upvotes = post.upvotes.filter((id) => id.toString() !== userId.toString());
+      }
+    } else if (action === "comment") {
+      post.comments.push({ content, author: userId });
+    }
+
+    await post.save();
+    const updatedPost = await Post.findById(postId)
+      .populate("author", "name username")
+      .populate("comments.author", "name username");
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    res.status(500).json({ error: "Error interacting with post." });
+  }
+};
+
+
+export const getMyGroups = async (req, res) => {
+  try {
+    const userId = req.user.id; // `req.user` is populated by the `requireAuth` middleware
+
+    // Find all groups where the user is a member
+    const myGroups = await Group.find({ members: userId });
+
+    if (!myGroups.length) {
+      return res.status(404).json({ message: "No groups found." });
+    }
+
+    res.status(200).json(myGroups);
+  } catch (error) {
+    console.error("Error fetching user's groups:", error);
+    res.status(500).json({ message: "Failed to fetch user's groups." });
+  }
+};
+
+export const upvotePost = async (req, res) => {
+  const { postId } = req.params;
+  const userId = req.user.id;
+  try {
+    const post = await Post.findById(postId);
+    if (post.upvotes.includes(userId)) {
+      return res.status(400).json({ error: "Already upvoted." });
+    }
+    post.upvotes.push(userId);
+    await post.save();
+    res.status(200).json({ updatedPost: post });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to upvote post." });
+  }
+};
+
+export const downvotePost = async (req, res) => {
+  const { postId } = req.params;
+  const userId = req.user.id;
+  try {
+    const post = await Post.findById(postId);
+    if (post.downvotes.includes(userId)) {
+      return res.status(400).json({ error: "Already downvoted." });
+    }
+    post.downvotes.push(userId);
+    await post.save();
+    res.status(200).json({ updatedPost: post });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to downvote post." });
   }
 };

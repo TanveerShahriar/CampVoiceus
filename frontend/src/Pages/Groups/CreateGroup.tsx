@@ -1,69 +1,71 @@
 import React, { useState } from "react";
 import axios from "axios";
-import SharedInput from "../../components/SharedInput";
 
 const CreateGroup: React.FC = () => {
-  const [groupName, setGroupName] = useState("");
-  const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [groupData, setGroupData] = useState({
+    name: "",
+    description: "",
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const handleCreateGroup = async (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setGroupData({ ...groupData, [name]: value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setSuccessMessage("");
-
+    setError(null);
+    setSuccess(null);
     const token = localStorage.getItem("token");
-
     try {
-      const response = await axios.post(
+       await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/groups/create`,
-        { groupName, description },
+        groupData,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setSuccessMessage(response.data.message || "Group created successfully!");
-      setGroupName("");
-      setDescription("");
+      setSuccess("Group created successfully!");
+      setGroupData({ name: "", description: "" });
     } catch (error) {
-      console.error("Error creating group:", error);
-      alert("Failed to create group. Please try again.");
-    } finally {
-      setLoading(false);
+      setError("Failed to create group. Please try again.");
     }
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold text-center mb-6">Create Group</h1>
-      {successMessage && <p className="text-green-500 text-center mb-4">{successMessage}</p>}
-      <form onSubmit={handleCreateGroup}>
-        <SharedInput
-          label="Group Name"
-          name="groupName"
-          value={groupName}
-          onChange={(e) => setGroupName(e.target.value)}
-          placeholder="Enter the group name"
-          required
-        />
-        <SharedInput
-          label="Description"
-          name="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Enter a brief description"
-          textarea
-          required
-        />
+      <h1 className="text-2xl font-bold text-center mb-6">Create a Group</h1>
+      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+      {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Group Name</label>
+          <input
+            type="text"
+            name="name"
+            value={groupData.name}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            name="description"
+            value={groupData.description}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          ></textarea>
+        </div>
         <button
           type="submit"
-          disabled={loading}
-          className={`w-full py-2 px-4 ${
-            loading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"
-          } text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+          className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
-          {loading ? "Creating..." : "Create Group"}
+          Create Group
         </button>
       </form>
     </div>
