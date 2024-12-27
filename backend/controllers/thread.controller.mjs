@@ -6,7 +6,7 @@ import { User } from '../models/index.mjs'
 
 export async function createThread(req, res) {
     try {
-        const { title, content } = req.body;
+        const { title, content, tags } = req.body; // Include tags in the request body
         const file = req.file;
 
         const token = req.headers.authorization?.split(" ")[1];
@@ -17,7 +17,14 @@ export async function createThread(req, res) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const authorId = decoded.id;
 
-        const threadData = { title, content, authorId, };
+        console.log(tags);
+
+        const threadData = {
+            title,
+            content,
+            authorId,
+            tags: typeof tags === "string" ? tags.split(",").map(tag => tag.trim()) : tags,
+        };
     
         if (file) {
             threadData.file = {
@@ -31,13 +38,31 @@ export async function createThread(req, res) {
         await newThread.save();
     
         res.status(201).json({
-            message: 'Thread registered successfully',
+            message: 'Thread created successfully',
+            thread: newThread,
         });
-        } catch (error) {
-            console.error('Error in createThread:', error);
-            res.status(500).json({ error: 'Internal server error' });
+    } catch (error) {
+        console.error('Error in createThread:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+export async function getThreadsByTag(req, res) {
+    try {
+        const { tag } = req.params;
+
+        const threads = await Thread.find({ tags: tag }).sort({ createdAt: -1 });
+
+        res.status(200).json({
+            message: `Threads with tag: ${tag}`,
+            threads,
+        });
+    } catch (error) {
+        console.error('Error in getThreadsByTag:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 
 export async function homeThreads(req, res) {
     try {
