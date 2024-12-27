@@ -203,7 +203,9 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
                 </Link>
             </div>
             <h2 className="text-xl font-bold text-indigo-600 mb-2">
-                {stateThread.title}
+                <Link to={`/threadDetails/${stateThread._id}`} className="hover:underline">
+                    {stateThread.title}
+                </Link>
             </h2>
             <p className="text-gray-700 mb-4">{stateThread.content}</p>
 

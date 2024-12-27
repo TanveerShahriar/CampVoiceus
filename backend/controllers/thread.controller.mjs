@@ -172,7 +172,22 @@ export async function downvote(req, res) {
 
         await thread.save();
 
-        return res.status(200).json({ message: 'Upvoted successfully', updatedThread : thread });
+        // get current user info
+        const user = await User.findById(downvoterId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "Your thread was downvoted!",
+                `${upvoterName} just downvoted your thread titled "${thread.title}".`,
+                threadId
+            );
+        }
+
+        return res.status(200).json({ message: 'Downvoted successfully', updatedThread : thread });
     } catch (error) {
         console.error('Error handling upvote:', error);
         return res.status(500).json({ error: 'An error occurred while upvoting' });
@@ -220,6 +235,21 @@ export async function comment(req, res) {
 
         // Save the thread
         await thread.save();
+
+        // get current user info
+        const user = await User.findById(userId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "New comment on your thread!",
+                `${upvoterName} just commented on your thread titled "${thread.title}".`,
+                threadId
+            );
+        }
 
         // Send back the updated thread
         return res.status(200).json({ message: 'Comment added successfully.', thread });
@@ -291,6 +321,21 @@ export async function upvoteComment(req, res) {
         // Save the updated thread document
         await thread.save();
 
+        // get current user info
+        const user = await User.findById(userId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "Your comment was upvoted!",
+                `${upvoterName} just upvoted your comment on the thread titled "${thread.title}".`,
+                threadId
+            );
+        }
+
         return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
     } catch (error) {
         console.error('Error upvoting comment:', error);
@@ -343,6 +388,21 @@ export async function downvoteComment(req, res) {
 
         // Save the updated thread document
         await thread.save();
+
+        // get current user info
+        const user = await User.findById(userId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "Your comment was downvoted!",
+                `${upvoterName} just downvoted your comment on the thread titled "${thread.title}".`,
+                threadId
+            );
+        }
 
         return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
     } catch (error) {
