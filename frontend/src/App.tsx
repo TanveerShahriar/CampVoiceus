@@ -17,6 +17,10 @@ import Dashboard from "./Pages/Profile/DashBoard";
 import ViewProfile from "./Pages/Profile/ViewProfile";
 import ProfileEdit from "./Pages/Profile/ProfileEdit";
 import ThreadDetails from "./Pages/Home/ThreadDetails";
+import CommunityCalendar from "./Pages/Calendar/CommunityCalendar";
+import CreateEvent from "./Pages/Calendar/CreateEvent";
+import MyEvents from "./Pages/Calendar/MyEvents";
+import 'react-calendar/dist/Calendar.css';
 
 
 
@@ -54,61 +58,83 @@ export default function App() {
 
   return (
     <div>
-      <Header></Header>
+      <Header />
       <Routes>
         <Route
           path="/"
           element={
             <RequireAuth>
-              <Home></Home>
+              <Home />
             </RequireAuth>
           }
-        ></Route>
-
+        />
         <Route
           path="/createthread"
           element={
             <RequireAuth>
-              <CreateThreads></CreateThreads>
+              <CreateThreads />
             </RequireAuth>
           }
-        ></Route>
-
-        <Route path="/register" element={<Register></Register>}></Route>
-        <Route path="/login" element={<Login></Login>}></Route>
+        />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
         <Route
           path="/dashboard"
           element={
             <RequireAuth>
-              <Dashboard></Dashboard>
+              <Dashboard />
             </RequireAuth>
           }
-        ></Route>
+        />
         <Route
           path="/profile/:username"
           element={
             <RequireAuth>
-              <ViewProfile></ViewProfile>
+              <ViewProfile />
             </RequireAuth>
           }
-        ></Route>
+        />
         <Route
           path="/profile/edit"
           element={
             <RequireAuth>
-              <ProfileEdit></ProfileEdit>
+              <ProfileEdit />
             </RequireAuth>
           }
-        ></Route>
+        />
         <Route
           path="/threadDetails/:threadId"
           element={
             <RequireAuth>
-              <ThreadDetails></ThreadDetails>
+              <ThreadDetails />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/calendar"
+          element={
+            <RequireAuth>
+              <CommunityCalendar />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/calendar/create"
+          element={
+            <RequireAuth>
+              <CreateEvent />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/myevents"
+          element={
+            <RequireAuth>
+              <MyEvents />
             </RequireAuth>
           }
         />
       </Routes>
     </div>
-  );
+  );  
 }

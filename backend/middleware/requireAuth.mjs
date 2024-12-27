@@ -14,8 +14,11 @@ export const requireAuth = async function(req, res, next) {
     const token = authorization.split(' ')[1];
     
     try {
-        const { _id } = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        req.user = await User.findById(_id).select('_id');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // Use your JWT secret key
+        req.user = await User.findById(decoded.id).select("_id"); 
+        if (!req.user) {
+            return res.status(401).json({ error: "User not found." });
+        }
         next();
     } catch (error) {
         console.log(error);
