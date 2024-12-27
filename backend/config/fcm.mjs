@@ -5,13 +5,16 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
 
-export const sendNotification = async (token, title, body) => {
+export const sendNotification = async (token, title, body, threadId) => {
     const message = {
         notification: {
             title: title,
             body: body,
         },
         token: token,
+        data: {
+            threadId: threadId,
+        },
     };
 
     try {

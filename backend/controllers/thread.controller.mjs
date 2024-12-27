@@ -118,13 +118,18 @@ export async function upvote(req, res) {
 
         await thread.save();
 
+        // get current user info
+        const user = await User.findById(upvoterId);
+        const upvoterName = user.name;
+
         // Fetch thread author's FCM token
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
             await sendNotification(
                 author.fcmToken,
                 "Your thread was upvoted!",
-                `A user just upvoted your thread titled "${thread.title}".`
+                `${upvoterName} just upvoted your thread titled "${thread.title}".`,
+                threadId
             );
         }
 
