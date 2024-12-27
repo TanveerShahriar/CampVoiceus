@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { sendNotification } from '../config/fcm.mjs';
 import { Thread } from '../models/index.mjs'
+import { User } from '../models/index.mjs'
 
 export async function createThread(req, res) {
     try {
@@ -115,6 +117,16 @@ export async function upvote(req, res) {
         thread.upvotes.push(upvoterId);
 
         await thread.save();
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "Your thread was upvoted!",
+                `A user just upvoted your thread titled "${thread.title}".`
+            );
+        }
 
         return res.status(200).json({ message: 'Upvoted successfully', updatedThread : thread });
     } catch (error) {
