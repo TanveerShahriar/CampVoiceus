@@ -104,7 +104,7 @@ export default function CreateThreads() {
 
         <div className="mb-4">
           <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-              File Upload
+              File Upload <p> Only images, videos or zip allowed! Max Size: 10MB</p>
           </label>
           <div className="relative mt-1 flex items-center">
             <input
