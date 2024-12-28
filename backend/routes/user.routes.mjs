@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { UserController } from '../controllers/index.mjs';
+import { getNotifications } from '../controllers/notifcation.controller.mjs';
 import { requireAuth } from '../middleware/requireAuth.mjs';
 
 const router = Router();
@@ -21,5 +22,7 @@ router.get('/profile/:username', UserController.getUserByUsername);
 router.get('/token', UserController.getUserByToken);
 
 router.put('/profile/edit', upload.single('avatarUrl'), UserController.updateUserByUsername);
+
+router.get('/notifications', getNotifications);
 
 export default router;

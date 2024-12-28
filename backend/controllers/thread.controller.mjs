@@ -2,8 +2,9 @@ import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import cloudinary from '../config/cloudinary.mjs';
 import { sendNotification } from '../config/fcm.mjs';
-import { Thread } from '../models/index.mjs'
-import { User } from '../models/index.mjs'
+import { Thread } from '../models/index.mjs';
+import { User } from '../models/index.mjs';
+import { Notification } from '../models/index.mjs';
 
 export async function createThread(req, res) {
     try {
@@ -170,12 +171,34 @@ export async function upvote(req, res) {
         // Fetch thread author's FCM token
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
+
+            const notificationTitle = "Your thread was upvoted!";
+            const notificationMessage = `${upvoterName} just upvoted your thread titled "${thread.title}".`;
+
             await sendNotification(
                 author.fcmToken,
-                "Your thread was upvoted!",
-                `${upvoterName} just upvoted your thread titled "${thread.title}".`,
+                notificationTitle,
+                notificationMessage,
                 threadId
             );
+
+            // Save notification in MongoDB
+            await Notification.create({
+                userId: author._id,
+                title: notificationTitle,
+                message: notificationMessage,
+                threadId: thread._id,
+            });
+
+            // Trim notifications to keep only the last 10
+            const notificationsCount = await Notification.countDocuments({ userId: author._id });
+            if (notificationsCount > 10) {
+                const oldestNotification = await Notification.find({ userId: author._id })
+                    .sort({ createdAt: 1 })
+                    .limit(notificationsCount - 10);
+                const idsToDelete = oldestNotification.map((n) => n._id);
+                await Notification.deleteMany({ _id: { $in: idsToDelete } });
+            }
         }
 
         return res.status(200).json({ message: 'Upvoted successfully', updatedThread : thread });
@@ -197,7 +220,7 @@ export async function downvote(req, res) {
     const downvoterId = decoded.id;
 
     if (!downvoterId) {
-        return res.status(400).json({ error: 'User name is required for upvoting' });
+        return res.status(400).json({ error: 'User name is required for downvoting' });
     }
 
     try {
@@ -208,36 +231,57 @@ export async function downvote(req, res) {
         }
 
         if (thread.downvotes.includes(downvoterId)) {
-            return res.status(400).json({ error: 'User has already upvoted this thread' });
+            return res.status(400).json({ error: 'User has already downvoted this thread' });
         }
 
         thread.upvotes = thread.upvotes.filter((id) => id !== downvoterId);
-
         thread.downvotes.push(downvoterId);
 
         await thread.save();
 
-        // get current user info
+        // Get current user info
         const user = await User.findById(downvoterId);
-        const upvoterName = user.name;
+        const downvoterName = user.name;
 
         // Fetch thread author's FCM token
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
+            const notificationTitle = "Your thread was downvoted!";
+            const notificationMessage = `${downvoterName} just downvoted your thread titled "${thread.title}".`;
+
             await sendNotification(
                 author.fcmToken,
-                "Your thread was downvoted!",
-                `${upvoterName} just downvoted your thread titled "${thread.title}".`,
+                notificationTitle,
+                notificationMessage,
                 threadId
             );
+
+            // Save notification in MongoDB
+            await Notification.create({
+                userId: author._id,
+                title: notificationTitle,
+                message: notificationMessage,
+                threadId: thread._id,
+            });
+
+            // Trim notifications to keep only the last 10
+            const notificationsCount = await Notification.countDocuments({ userId: author._id });
+            if (notificationsCount > 10) {
+                const oldestNotification = await Notification.find({ userId: author._id })
+                    .sort({ createdAt: 1 })
+                    .limit(notificationsCount - 10);
+                const idsToDelete = oldestNotification.map((n) => n._id);
+                await Notification.deleteMany({ _id: { $in: idsToDelete } });
+            }
         }
 
-        return res.status(200).json({ message: 'Downvoted successfully', updatedThread : thread });
+        return res.status(200).json({ message: 'Downvoted successfully', updatedThread: thread });
     } catch (error) {
-        console.error('Error handling upvote:', error);
-        return res.status(500).json({ error: 'An error occurred while upvoting' });
+        console.error('Error handling downvote:', error);
+        return res.status(500).json({ error: 'An error occurred while downvoting' });
     }
 }
+
 
 export async function comment(req, res) {
     const { threadId, content } = req.body;
@@ -252,7 +296,6 @@ export async function comment(req, res) {
     }
 
     try {
-        // Decode the token to extract user ID
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const userId = decoded.id;
 
@@ -260,13 +303,11 @@ export async function comment(req, res) {
             return res.status(401).json({ error: 'Invalid token or user not authorized.' });
         }
 
-        // Find the thread by ID
         const thread = await Thread.findById(threadId);
         if (!thread) {
             return res.status(404).json({ error: 'Thread not found.' });
         }
 
-        // Create a new comment
         const newComment = {
             userId,
             content,
@@ -275,28 +316,45 @@ export async function comment(req, res) {
             createdAt: new Date(),
         };
 
-        // Add the comment to the thread
         thread.comments.push(newComment);
-
-        // Save the thread
         await thread.save();
 
-        // get current user info
+        // Get current user info
         const user = await User.findById(userId);
-        const upvoterName = user.name;
+        const commenterName = user.name;
 
         // Fetch thread author's FCM token
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
+            const notificationTitle = "New comment on your thread!";
+            const notificationMessage = `${commenterName} just commented on your thread titled "${thread.title}".`;
+
             await sendNotification(
                 author.fcmToken,
-                "New comment on your thread!",
-                `${upvoterName} just commented on your thread titled "${thread.title}".`,
+                notificationTitle,
+                notificationMessage,
                 threadId
             );
+
+            // Save notification in MongoDB
+            await Notification.create({
+                userId: author._id,
+                title: notificationTitle,
+                message: notificationMessage,
+                threadId: thread._id,
+            });
+
+            // Trim notifications to keep only the last 10
+            const notificationsCount = await Notification.countDocuments({ userId: author._id });
+            if (notificationsCount > 10) {
+                const oldestNotification = await Notification.find({ userId: author._id })
+                    .sort({ createdAt: 1 })
+                    .limit(notificationsCount - 10);
+                const idsToDelete = oldestNotification.map((n) => n._id);
+                await Notification.deleteMany({ _id: { $in: idsToDelete } });
+            }
         }
 
-        // Send back the updated thread
         return res.status(200).json({ message: 'Comment added successfully.', thread });
     } catch (error) {
         console.error('Error adding comment:', error);
@@ -305,7 +363,8 @@ export async function comment(req, res) {
         }
         return res.status(500).json({ error: 'Internal server error.' });
     }
-};
+}
+
 
 
 export async function getUserThreads(req, res) {
@@ -332,53 +391,65 @@ export async function upvoteComment(req, res) {
     const userId = decoded.id;
 
     if (!userId) {
-        return res.status(400).json({ error: 'User name is required for upvoting' });
+        return res.status(400).json({ error: 'User ID is required for upvoting.' });
     }
 
     if (!threadId || !commentId) {
-        return res.status(400).json({ message: 'threadId, and commentId are required.' });
+        return res.status(400).json({ message: 'Thread ID and comment ID are required.' });
     }
 
     try {
-        // Find the thread containing the comment
         const thread = await Thread.findById(threadId);
         if (!thread) {
             return res.status(404).json({ message: 'Thread not found.' });
         }
 
-        // Locate the comment in the thread
         const comment = thread.comments.find((c) => c.commentId.equals(new mongoose.Types.ObjectId(commentId)));
         if (!comment) {
             return res.status(404).json({ message: 'Comment not found.' });
         }
 
-        // Check if user has already upvoted the comment
         if (comment.upvotes.includes(userId)) {
             return res.status(400).json({ message: 'You have already upvoted this comment.' });
         }
 
-        // Remove userId from downvotes if present
         comment.downvotes = comment.downvotes.filter((id) => id !== userId);
-
-        // Add userId to upvotes
         comment.upvotes.push(userId);
 
-        // Save the updated thread document
         await thread.save();
 
-        // get current user info
         const user = await User.findById(userId);
         const upvoterName = user.name;
 
-        // Fetch thread author's FCM token
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
+            const notificationTitle = "Your comment was upvoted!";
+            const notificationMessage = `${upvoterName} just upvoted your comment on the thread titled "${thread.title}".`;
+
             await sendNotification(
                 author.fcmToken,
-                "Your comment was upvoted!",
-                `${upvoterName} just upvoted your comment on the thread titled "${thread.title}".`,
+                notificationTitle,
+                notificationMessage,
                 threadId
             );
+
+            // Save notification in MongoDB
+            await Notification.create({
+                userId: author._id,
+                title: notificationTitle,
+                message: notificationMessage,
+                threadId: thread._id,
+            });
+
+            // Trim notifications to keep only the last 10
+            const notificationsCount = await Notification.countDocuments({ userId: author._id });
+            if (notificationsCount > 10) {
+                const oldestNotification = await Notification.find({ userId: author._id })
+                    .sort({ createdAt: 1 })
+                    .limit(notificationsCount - 10);
+                const idsToDelete = oldestNotification.map((n) => n._id);
+                await Notification.deleteMany({ _id: { $in: idsToDelete } });
+            }
         }
 
         return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
@@ -400,58 +471,70 @@ export async function downvoteComment(req, res) {
     const userId = decoded.id;
 
     if (!userId) {
-        return res.status(400).json({ error: 'User name is required for upvoting' });
+        return res.status(400).json({ error: 'User ID is required for downvoting.' });
     }
 
     if (!threadId || !commentId) {
-        return res.status(400).json({ message: 'threadId, and commentId are required.' });
+        return res.status(400).json({ message: 'Thread ID and comment ID are required.' });
     }
 
     try {
-        // Find the thread containing the comment
         const thread = await Thread.findById(threadId);
         if (!thread) {
             return res.status(404).json({ message: 'Thread not found.' });
         }
 
-        // Locate the comment in the thread
         const comment = thread.comments.find((c) => c.commentId.equals(new mongoose.Types.ObjectId(commentId)));
         if (!comment) {
             return res.status(404).json({ message: 'Comment not found.' });
         }
 
-        // Check if user has already downvoted the comment
         if (comment.downvotes.includes(userId)) {
             return res.status(400).json({ message: 'You have already downvoted this comment.' });
         }
 
-        // Remove userId from upvotes if present
         comment.upvotes = comment.upvotes.filter((id) => id !== userId);
-
-        // Add userId to upvotes
         comment.downvotes.push(userId);
 
-        // Save the updated thread document
         await thread.save();
 
-        // get current user info
         const user = await User.findById(userId);
-        const upvoterName = user.name;
+        const downvoterName = user.name;
 
-        // Fetch thread author's FCM token
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
+            const notificationTitle = "Your comment was downvoted!";
+            const notificationMessage = `${downvoterName} just downvoted your comment on the thread titled "${thread.title}".`;
+
             await sendNotification(
                 author.fcmToken,
-                "Your comment was downvoted!",
-                `${upvoterName} just downvoted your comment on the thread titled "${thread.title}".`,
+                notificationTitle,
+                notificationMessage,
                 threadId
             );
+
+            // Save notification in MongoDB
+            await Notification.create({
+                userId: author._id,
+                title: notificationTitle,
+                message: notificationMessage,
+                threadId: thread._id,
+            });
+
+            // Trim notifications to keep only the last 10
+            const notificationsCount = await Notification.countDocuments({ userId: author._id });
+            if (notificationsCount > 10) {
+                const oldestNotification = await Notification.find({ userId: author._id })
+                    .sort({ createdAt: 1 })
+                    .limit(notificationsCount - 10);
+                const idsToDelete = oldestNotification.map((n) => n._id);
+                await Notification.deleteMany({ _id: { $in: idsToDelete } });
+            }
         }
 
-        return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
+        return res.status(200).json({ message: 'Comment downvoted successfully.', updatedComment: comment });
     } catch (error) {
-        console.error('Error upvoting comment:', error);
+        console.error('Error downvoting comment:', error);
         return res.status(500).json({ message: 'Internal server error.' });
     }
 };
