@@ -421,7 +421,7 @@ export async function upvoteComment(req, res) {
         const user = await User.findById(userId);
         const upvoterName = user.name;
 
-        const author = await User.findById(thread.authorId);
+        const author = await User.findById(comment.userId);
         if (author?.fcmToken) {
             const notificationTitle = "Your comment was upvoted!";
             const notificationMessage = `${upvoterName} just upvoted your comment on the thread titled "${thread.title}".`;
@@ -501,7 +501,7 @@ export async function downvoteComment(req, res) {
         const user = await User.findById(userId);
         const downvoterName = user.name;
 
-        const author = await User.findById(thread.authorId);
+        const author = await User.findById(comment.authorId);
         if (author?.fcmToken) {
             const notificationTitle = "Your comment was downvoted!";
             const notificationMessage = `${downvoterName} just downvoted your comment on the thread titled "${thread.title}".`;
