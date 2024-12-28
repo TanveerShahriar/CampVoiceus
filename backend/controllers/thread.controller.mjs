@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import cloudinary from '../config/cloudinary.mjs';
 import { sendNotification } from '../config/fcm.mjs';
 import { Thread } from '../models/index.mjs'
 import { User } from '../models/index.mjs'
@@ -26,13 +27,33 @@ export async function createThread(req, res) {
             tags: typeof tags === "string" ? tags.split(",").map(tag => tag.trim()) : tags,
         };
     
+        // Upload file to Cloudinary if present
         if (file) {
+            const uploadResponse = await new Promise((resolve, reject) => {
+                const options = {
+                    folder: 'campV_threads',
+                    resource_type: file.mimetype === 'application/zip' ? 'raw' : 'auto', // Handle ZIP files as raw
+                };
+        
+                const stream = cloudinary.uploader.upload_stream(
+                    options,
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+        
+                stream.end(file.buffer);
+            });
+        
             threadData.file = {
-              name: file.originalname,
-              contentType: file.mimetype,
-              data: file.buffer,
+                name: file.originalname,
+                url: uploadResponse.secure_url,
+                publicId: uploadResponse.public_id,
+                contentType: file.mimetype,
             };
         }
+        
 
         const newThread = new Thread(threadData);
         await newThread.save();
@@ -96,20 +117,19 @@ export async function getThreadById(req, res){
 
 export async function fileDownload(req, res) {
     try {
-        const { threadId } = req.body;
-        
-        const thread = await Thread.findById(threadId);
-        const file = thread.file;
-        if (!file) return res.status(404).json({ error: 'File not found' });
-        res.set({
-            'Content-Type': file.contentType,
-            'Content-Disposition': `attachment; filename="${file.name}"`,
-        });
-        res.send(file.data);
+      const { threadId } = req.body;
+  
+      const thread = await Thread.findById(threadId);
+      const file = thread.file;
+      if (!file) return res.status(404).json({ error: 'File not found' });
+  
+      res.redirect(file.url);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to download file' });
+      console.error('Error in fileDownload:', error);
+      res.status(500).json({ error: 'Failed to download file' });
     }
-};
+  }
+  
 
 export async function upvote(req, res) {
     const { threadId } = req.body;

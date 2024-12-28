@@ -14,10 +14,11 @@ const CommentSchema = new mongoose.Schema({
 // Define the File schema
 const FileSchema = new mongoose.Schema({
   name: { type: String, required: true }, // File name
-  contentType: { type: String, required: true }, // File MIME type (e.g., 'image/png', 'application/pdf')
-  data: { type: Buffer, required: true }, // File content as Buffer
-  uploadedAt: { type: Date, default: Date.now },
+  url: { type: String, required: true }, // Cloudinary URL
+  publicId: { type: String, required: true }, // Cloudinary public ID
+  contentType: { type: String, required: true }, // MIME type
 });
+
 
 // Define the Thread schema
 const ThreadSchema = new mongoose.Schema({
