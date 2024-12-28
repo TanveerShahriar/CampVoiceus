@@ -5,5 +5,4 @@ import Notification from "./notificaion.model.mjs";
 import Group from "./group.model.mjs";
 import GroupThread from "./groupThread.model.mjs";
 
-export { User, Thread, Event, Group, GroupThread };
-export { User, Thread, Event, Notification };
+export { User, Thread, Event, Group, GroupThread, Notification };
