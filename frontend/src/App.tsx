@@ -11,12 +11,12 @@ import ProfileEdit from "./Pages/Profile/ProfileEdit";
 import CommunityCalendar from "./Pages/Calendar/CommunityCalendar";
 import CreateEvent from "./Pages/Calendar/CreateEvent";
 import MyEvents from "./Pages/Calendar/MyEvents";
-import CreateGroup from "./Pages/Groups/CreateGroup";
-import ShowAllGroups from "./Pages/Groups/AllGroups";
+import ShowAllGroups from "./Pages/Groups/ShowAllGroups";
 import MyGroups from "./Pages/Groups/MyGroups";
-import GroupPosts from "./Pages/Groups/GroupPosts";
-import 'react-calendar/dist/Calendar.css';
-import CreatePost from "./Pages/Groups/CreatePost";
+import CreateGroup from "./Pages/Groups/CreateGroup";
+import GroupPage from "./Pages/Groups/GroupPage";
+import CreateGroupThread from "./Pages/Groups/CreateGroupThread";
+import "react-calendar/dist/Calendar.css";
 
 export default function App() {
   return (
@@ -24,9 +24,11 @@ export default function App() {
       <Header />
 
       <Routes>
+        {/* Authentication Routes */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
+        {/* Protected Routes */}
         <Route
           path="/"
           element={
@@ -35,7 +37,6 @@ export default function App() {
             </RequireAuth>
           }
         />
-
         <Route
           path="/createthread"
           element={
@@ -44,7 +45,6 @@ export default function App() {
             </RequireAuth>
           }
         />
-
         <Route
           path="/dashboard"
           element={
@@ -70,6 +70,7 @@ export default function App() {
           }
         />
 
+        {/* Calendar Routes */}
         <Route
           path="/calendar"
           element={
@@ -95,14 +96,7 @@ export default function App() {
           }
         />
 
-        <Route
-          path="/groups/create"
-          element={
-            <RequireAuth>
-              <CreateGroup />
-            </RequireAuth>
-          }
-        />
+        {/* Group Routes */}
         <Route
           path="/groups"
           element={
@@ -120,21 +114,29 @@ export default function App() {
           }
         />
         <Route
-          path="/groups/:groupId"
+          path="/groups/create"
           element={
             <RequireAuth>
-              <GroupPosts />
+              <CreateGroup />
             </RequireAuth>
           }
         />
         <Route
-    path="/groups/:groupId/createpost"
-    element={
-      <RequireAuth>
-        <CreatePost />
-      </RequireAuth>
-    }
-  />
+          path="/groups/:groupId"
+          element={
+            <RequireAuth>
+              <GroupPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/groups/:groupId/createthread"
+          element={
+            <RequireAuth>
+              <CreateGroupThread />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </div>
   );

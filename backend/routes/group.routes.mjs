@@ -1,33 +1,39 @@
-import { Router } from "express";
-import {
-  createGroup,
-  getAllGroups,
-  joinGroup,
-  leaveGroup,
-  createPost,
-  getGroupPosts,
-  getPostDetails,
-  interactWithPost,
-  getMyGroups,
-  upvotePost,
-  downvotePost,
-} from "../controllers/group.controller.mjs";
+import express from "express";
+import { GroupController } from "../controllers/index.mjs";
 import { requireAuth } from "../middleware/requireAuth.mjs";
+import multer from 'multer';
 
-const router = Router();
+const storage = multer.memoryStorage(); // Store file in memory as Buffer
+const upload = multer({ storage });
 
-router.use(requireAuth);
+const router = express.Router();
 
-router.post("/create", createGroup);
-router.get("/allgroups", getAllGroups);
-router.get("/mine", getMyGroups);
-router.post("/:groupId/join", joinGroup);
-router.post("/:groupId/leave", leaveGroup);
-router.post("/:groupId/post", createPost);
-router.get("/:groupId/posts", getGroupPosts);
-router.get("/:groupId/posts/:postId", getPostDetails);
-router.post("/:groupId/posts/:postId/interact", interactWithPost);
-router.post("/:groupId/posts/:postId/upvote", upvotePost);
-router.post("/:groupId/posts/:postId/downvote", downvotePost);
+// Public: Fetch all groups
+router.get("/allgroups", requireAuth,  GroupController.getAllGroups);
+
+// Protected: Create a group
+router.post("/create", requireAuth, GroupController.createGroup);
+
+// Protected: Fetch groups joined by the user
+router.get("/mine", requireAuth, GroupController.getJoinedGroups);
+
+// Protected: Join a group
+router.post("/:groupId/join", requireAuth, GroupController.joinGroup);
+
+// Protected: Leave a group
+router.post("/:groupId/leave", requireAuth, GroupController.leaveGroup);
+
+router.post('/createthread', upload.single('file'), GroupController.createThread);
+router.post('/groupthreads', GroupController.homeThreads);
+router.post('/getthreadbyid', GroupController.getThreadById);
+router.post('/upvote', GroupController.upvote);
+router.post('/downvote', GroupController.downvote);
+router.post('/comment', GroupController.comment);
+router.get('/user/:userId', GroupController.getUserThreads);
+router.post('/upvotecomment', GroupController.upvoteComment);
+router.post('/downvotecomment', GroupController.downvoteComment);
+router.post('/filedownload', GroupController.fileDownload);
+
+
 
 export default router;

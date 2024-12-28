@@ -19,21 +19,7 @@ export default function Header() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Determine the current page for conditional rendering
-  const isMyGroupsPage = location.pathname === "/groups/mine";
-  const isAllGroupsPage = location.pathname === "/groups";
-  const isCreateGroupPage = location.pathname === "/groups/create";
-  const isMyEventsPage = location.pathname === "/myevents";
-
-  const showCreateThread =
-    ![
-      "/calendar",
-      "/myevents",
-      "/calendar/create",
-      "/groups/mine",
-      "/groups",
-      "/groups/create",
-    ].includes(location.pathname);
+  const showCreateThread = !location.pathname.startsWith("/groups");
 
   return (
     <nav className="bg-indigo-600 shadow-lg mb-2">
@@ -54,7 +40,10 @@ export default function Header() {
                       Profile
                     </CustomLink>
                     {showCreateThread && (
-                      <CustomLink to="/createthread" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
+                      <CustomLink
+                        to="/createthread"
+                        icon={<PlusSquare className="w-5 h-5 mr-1" />}
+                      >
                         Create Thread
                       </CustomLink>
                     )}
@@ -62,53 +51,19 @@ export default function Header() {
                     <CustomLink to="/myevents" icon={<Calendar className="w-5 h-5 mr-1" />}>
                       My Events
                     </CustomLink>
-                    {isMyEventsPage && (
-                      <>
-                        <CustomLink to="/calendar" icon={<Calendar className="w-5 h-5 mr-1" />}>
-                          Explore Events
-                        </CustomLink>
-                        <CustomLink
-                          to="/calendar/create"
-                          icon={<PlusSquare className="w-5 h-5 mr-1" />}
-                        >
-                          Create Event
-                        </CustomLink>
-                      </>
-                    )}
                     {/* Group Buttons */}
+                    <CustomLink to="/groups" icon={<Users className="w-5 h-5 mr-1" />}>
+                      All Groups
+                    </CustomLink>
                     <CustomLink to="/groups/mine" icon={<Users className="w-5 h-5 mr-1" />}>
                       My Groups
                     </CustomLink>
-                    {isMyGroupsPage && (
-                      <>
-                        <CustomLink to="/groups/create" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
-                          Create Group
-                        </CustomLink>
-                        <CustomLink to="/groups" icon={<Users className="w-5 h-5 mr-1" />}>
-                          All Groups
-                        </CustomLink>
-                      </>
-                    )}
-                    {isAllGroupsPage && (
-                      <>
-                        <CustomLink to="/groups/mine" icon={<Users className="w-5 h-5 mr-1" />}>
-                          My Groups
-                        </CustomLink>
-                        <CustomLink to="/groups/create" icon={<PlusSquare className="w-5 h-5 mr-1" />}>
-                          Create Group
-                        </CustomLink>
-                      </>
-                    )}
-                    {isCreateGroupPage && (
-                      <>
-                        <CustomLink to="/groups/mine" icon={<Users className="w-5 h-5 mr-1" />}>
-                          My Groups
-                        </CustomLink>
-                        <CustomLink to="/groups" icon={<Users className="w-5 h-5 mr-1" />}>
-                          All Groups
-                        </CustomLink>
-                      </>
-                    )}
+                    <CustomLink
+                      to="/groups/create"
+                      icon={<PlusSquare className="w-5 h-5 mr-1" />}
+                    >
+                      Create Group
+                    </CustomLink>
                   </>
                 )}
               </div>
@@ -193,11 +148,25 @@ export default function Header() {
                   My Events
                 </CustomLink>
                 <CustomLink
+                  to="/groups"
+                  className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                  icon={<Users className="w-5 h-5 mr-1" />}
+                >
+                  All Groups
+                </CustomLink>
+                <CustomLink
                   to="/groups/mine"
                   className="block text-white px-3 py-2 rounded-md text-base font-medium"
                   icon={<Users className="w-5 h-5 mr-1" />}
                 >
                   My Groups
+                </CustomLink>
+                <CustomLink
+                  to="/groups/create"
+                  className="block text-white px-3 py-2 rounded-md text-base font-medium"
+                  icon={<PlusSquare className="w-5 h-5 mr-1" />}
+                >
+                  Create Group
                 </CustomLink>
               </>
             )}
