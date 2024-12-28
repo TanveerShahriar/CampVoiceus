@@ -1,4 +1,12 @@
 import { Route, Routes } from "react-router-dom";
+
+import { useEffect } from "react";
+import axios from "axios";
+import {
+  requestNotificationPermission,
+  listenForNotifications,
+} from "./firebase/notificationService";
+
 import Header from "./Pages/Shared/Header";
 import Home from "./Pages/Home/Home";
 import Register from "./Pages/Login/Register";
@@ -8,6 +16,7 @@ import CreateThreads from "./Pages/Threads/CreateThreads";
 import Dashboard from "./Pages/Profile/DashBoard";
 import ViewProfile from "./Pages/Profile/ViewProfile";
 import ProfileEdit from "./Pages/Profile/ProfileEdit";
+import ThreadDetails from "./Pages/Home/ThreadDetails";
 import CommunityCalendar from "./Pages/Calendar/CommunityCalendar";
 import CreateEvent from "./Pages/Calendar/CreateEvent";
 import MyEvents from "./Pages/Calendar/MyEvents";
@@ -19,6 +28,37 @@ import CreateGroupThread from "./Pages/Groups/CreateGroupThread";
 import "react-calendar/dist/Calendar.css";
 
 export default function App() {
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      const fcmToken = await requestNotificationPermission();
+      const authToken = localStorage.getItem("token");
+  
+      console.log("fcmToken", fcmToken);
+      console.log("authToken", authToken);
+  
+      if (fcmToken && authToken) {
+        try {
+          await axios.post(
+            `${import.meta.env.VITE_SERVER_URL}/users/savefcmtoken`,
+            { fcmToken },
+            {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            }
+          );
+          console.log("FCM token saved successfully.");
+        } catch (error) {
+          console.error("Error saving FCM token:", error);
+        }
+      }
+    };
+  
+    initializeNotifications();
+    listenForNotifications();
+  }, []);
+  
+
   return (
     <div>
       <Header />
@@ -45,6 +85,7 @@ export default function App() {
             </RequireAuth>
           }
         />
+
         <Route
           path="/dashboard"
           element={
@@ -66,11 +107,20 @@ export default function App() {
           element={
             <RequireAuth>
               <ProfileEdit />
+
             </RequireAuth>
           }
         />
 
         {/* Calendar Routes */}
+        <Route
+          path="/threadDetails/:threadId"
+          element={
+            <RequireAuth>
+              <ThreadDetails />
+            </RequireAuth>
+          }
+        />
         <Route
           path="/calendar"
           element={
@@ -139,5 +189,5 @@ export default function App() {
         />
       </Routes>
     </div>
-  );
+  );  
 }

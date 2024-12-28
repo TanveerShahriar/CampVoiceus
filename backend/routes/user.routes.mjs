@@ -9,6 +9,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.get('/', UserController.welcome);
 router.post('/register', UserController.registerUser);
 router.post('/login', UserController.loginUser);
+router.post('/savefcmtoken', UserController.saveFcmToken);
 
 router.use(requireAuth);
 

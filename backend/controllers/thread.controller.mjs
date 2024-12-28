@@ -1,10 +1,12 @@
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { sendNotification } from '../config/fcm.mjs';
 import { Thread } from '../models/index.mjs'
+import { User } from '../models/index.mjs'
 
 export async function createThread(req, res) {
     try {
-        const { title, content } = req.body;
+        const { title, content, tags } = req.body; // Include tags in the request body
         const file = req.file;
 
         const token = req.headers.authorization?.split(" ")[1];
@@ -15,7 +17,14 @@ export async function createThread(req, res) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const authorId = decoded.id;
 
-        const threadData = { title, content, authorId, };
+        console.log(tags);
+
+        const threadData = {
+            title,
+            content,
+            authorId,
+            tags: typeof tags === "string" ? tags.split(",").map(tag => tag.trim()) : tags,
+        };
     
         if (file) {
             threadData.file = {
@@ -29,13 +38,31 @@ export async function createThread(req, res) {
         await newThread.save();
     
         res.status(201).json({
-            message: 'Thread registered successfully',
+            message: 'Thread created successfully',
+            thread: newThread,
         });
-        } catch (error) {
-            console.error('Error in createThread:', error);
-            res.status(500).json({ error: 'Internal server error' });
+    } catch (error) {
+        console.error('Error in createThread:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+export async function getThreadsByTag(req, res) {
+    try {
+        const { tag } = req.params;
+
+        const threads = await Thread.find({ tags: tag }).sort({ createdAt: -1 });
+
+        res.status(200).json({
+            message: `Threads with tag: ${tag}`,
+            threads,
+        });
+    } catch (error) {
+        console.error('Error in getThreadsByTag:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 
 export async function homeThreads(req, res) {
     try {
@@ -85,9 +112,14 @@ export async function fileDownload(req, res) {
 };
 
 export async function upvote(req, res) {
-    const { upvoter, threadId } = req.body;
+    const { threadId } = req.body;
+
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
     
-    const decoded = jwt.verify(upvoter, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const upvoterId = decoded.id;
 
     if (!upvoterId) {
@@ -111,6 +143,21 @@ export async function upvote(req, res) {
 
         await thread.save();
 
+        // get current user info
+        const user = await User.findById(upvoterId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "Your thread was upvoted!",
+                `${upvoterName} just upvoted your thread titled "${thread.title}".`,
+                threadId
+            );
+        }
+
         return res.status(200).json({ message: 'Upvoted successfully', updatedThread : thread });
     } catch (error) {
         console.error('Error handling upvote:', error);
@@ -119,9 +166,14 @@ export async function upvote(req, res) {
 }
 
 export async function downvote(req, res) {
-    const { downvoter, threadId } = req.body;
+    const { threadId } = req.body;
+
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
     
-    const decoded = jwt.verify(downvoter, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const downvoterId = decoded.id;
 
     if (!downvoterId) {
@@ -145,7 +197,22 @@ export async function downvote(req, res) {
 
         await thread.save();
 
-        return res.status(200).json({ message: 'Upvoted successfully', updatedThread : thread });
+        // get current user info
+        const user = await User.findById(downvoterId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "Your thread was downvoted!",
+                `${upvoterName} just downvoted your thread titled "${thread.title}".`,
+                threadId
+            );
+        }
+
+        return res.status(200).json({ message: 'Downvoted successfully', updatedThread : thread });
     } catch (error) {
         console.error('Error handling upvote:', error);
         return res.status(500).json({ error: 'An error occurred while upvoting' });
@@ -153,10 +220,15 @@ export async function downvote(req, res) {
 }
 
 export async function comment(req, res) {
-    const { threadId, content, token } = req.body;
+    const { threadId, content } = req.body;
 
-    if (!threadId || !content || !token) {
-        return res.status(400).json({ error: 'Thread ID, content, and token are required.' });
+    if (!threadId || !content) {
+        return res.status(400).json({ error: 'Thread ID and content are required.' });
+    }
+
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
     }
 
     try {
@@ -189,6 +261,21 @@ export async function comment(req, res) {
         // Save the thread
         await thread.save();
 
+        // get current user info
+        const user = await User.findById(userId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "New comment on your thread!",
+                `${upvoterName} just commented on your thread titled "${thread.title}".`,
+                threadId
+            );
+        }
+
         // Send back the updated thread
         return res.status(200).json({ message: 'Comment added successfully.', thread });
     } catch (error) {
@@ -212,14 +299,24 @@ export async function getUserThreads(req, res) {
         res.status(500).json({ error: 'An error occurred while fetching user threads' });
     }
 }
-export async function upvoteComment(req, res) {
-    const { upvoter, threadId, commentId } = req.body;
 
-    const decoded = jwt.verify(upvoter, process.env.JWT_SECRET_KEY);
+export async function upvoteComment(req, res) {
+    const { threadId, commentId } = req.body;
+
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const userId = decoded.id;
 
-    if (!userId || !threadId || !commentId) {
-        return res.status(400).json({ message: 'userId, threadId, and commentId are required.' });
+    if (!userId) {
+        return res.status(400).json({ error: 'User name is required for upvoting' });
+    }
+
+    if (!threadId || !commentId) {
+        return res.status(400).json({ message: 'threadId, and commentId are required.' });
     }
 
     try {
@@ -249,6 +346,21 @@ export async function upvoteComment(req, res) {
         // Save the updated thread document
         await thread.save();
 
+        // get current user info
+        const user = await User.findById(userId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "Your comment was upvoted!",
+                `${upvoterName} just upvoted your comment on the thread titled "${thread.title}".`,
+                threadId
+            );
+        }
+
         return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
     } catch (error) {
         console.error('Error upvoting comment:', error);
@@ -257,13 +369,22 @@ export async function upvoteComment(req, res) {
 };
 
 export async function downvoteComment(req, res) {
-    const { downvoter, threadId, commentId } = req.body;
+    const { threadId, commentId } = req.body;
 
-    const decoded = jwt.verify(downvoter, process.env.JWT_SECRET_KEY);
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const userId = decoded.id;
 
-    if (!userId || !threadId || !commentId) {
-        return res.status(400).json({ message: 'userId, threadId, and commentId are required.' });
+    if (!userId) {
+        return res.status(400).json({ error: 'User name is required for upvoting' });
+    }
+
+    if (!threadId || !commentId) {
+        return res.status(400).json({ message: 'threadId, and commentId are required.' });
     }
 
     try {
@@ -292,6 +413,21 @@ export async function downvoteComment(req, res) {
 
         // Save the updated thread document
         await thread.save();
+
+        // get current user info
+        const user = await User.findById(userId);
+        const upvoterName = user.name;
+
+        // Fetch thread author's FCM token
+        const author = await User.findById(thread.authorId);
+        if (author?.fcmToken) {
+            await sendNotification(
+                author.fcmToken,
+                "Your comment was downvoted!",
+                `${upvoterName} just downvoted your comment on the thread titled "${thread.title}".`,
+                threadId
+            );
+        }
 
         return res.status(200).json({ message: 'Comment upvoted successfully.', updatedComment: comment });
     } catch (error) {

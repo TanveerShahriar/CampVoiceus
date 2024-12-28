@@ -29,6 +29,7 @@ const ThreadSchema = new mongoose.Schema({
   upvotes: { type: [String], default: [] }, // Array of userIds who upvoted the thread
   downvotes: { type: [String], default: [] }, // Array of userIds who downvoted the thread
   file: { type: FileSchema, required: false }, // Optional file field
+  tags: { type: [String], default: [], required: false },
   createdAt: { type: Date, default: Date.now },
 });
 

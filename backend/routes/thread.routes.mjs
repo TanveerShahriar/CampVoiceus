@@ -9,6 +9,7 @@ const router = Router();
 
 router.post('/createthread', upload.single('file'), ThreadController.createThread);
 router.post('/homethreads', ThreadController.homeThreads);
+router.get('/filterbytag/:tag', ThreadController.getThreadsByTag);
 router.post('/getthreadbyid', ThreadController.getThreadById);
 router.post('/upvote', ThreadController.upvote);
 router.post('/downvote', ThreadController.downvote);

@@ -76,7 +76,6 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
             const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/comment`, {
                 threadId,
                 content: newComment,
-                token
             },
             {
                 headers: {

@@ -198,3 +198,43 @@ export const updateUserByUsername = async (req, res) => {
     res.status(500).json({ error: "An error occurred while updating user data" });
   }
 };
+
+
+export async function saveFcmToken(req, res) {
+    const token = req.headers.authorization?.split(" ")[1];
+    const { fcmToken } = req.body;
+
+    if (!token) {
+        return res.status(401).json({ error: "Token missing" });
+    }
+
+    if (!fcmToken) {
+        return res.status(400).json({ error: "FCM token is required" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+        // Update the user's FCM token
+        const user = await User.findByIdAndUpdate(
+            decoded.id,
+            { fcmToken },
+            { new: true, runValidators: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({
+            message: "FCM token saved successfully",
+            userId: user._id,
+        });
+    } catch (error) {
+        console.error("Error saving FCM token:", error);
+        if (error.name === "JsonWebTokenError") {
+            return res.status(401).json({ error: "Invalid token" });
+        }
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
