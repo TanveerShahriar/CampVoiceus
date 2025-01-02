@@ -47,11 +47,6 @@ const ViewProfile: React.FC = () => {
           <div className="flex-grow text-center md:text-left">
             <div className="flex items-center justify-center md:justify-between mb-4">
               <h1 className="text-2xl font-bold">{profile.name}</h1>
-              <div className="hidden md:flex space-x-2">
-                <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-                  Follow
-                </button>
-              </div>
             </div>
             <p className="text-gray-600 mb-2">@{profile.username}</p>
             <p className="text-gray-800 mb-4">{profile.bio || 'No bio available'}</p>
