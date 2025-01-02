@@ -75,11 +75,6 @@ const Dashboard: React.FC = () => {
             </div>
             <p className="text-gray-600 mb-2">@{user.username}</p>
             <p className="text-gray-800 mb-4">{user.bio || 'No bio available'}</p>
-            <div className="flex justify-center md:justify-start space-x-6 text-sm">
-              <span><strong>123</strong> posts</span>
-              <span><strong>1.5k</strong> followers</span>
-              <span><strong>500</strong> following</span>
-            </div>
           </div>
         </div>
       </div>
