@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import HomeThread from "./HomeThread";
+import HomeThread from "../Pages/Home/HomeThread";
 
 interface Thread {
   _id: string;
