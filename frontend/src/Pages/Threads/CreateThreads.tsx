@@ -7,22 +7,40 @@ export default function CreateThreads() {
     content: "",
     file: null,
   });
+  const [tags, setTags] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [tagInput, setTagInput] = useState("");
 
   // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value, files, type } = e.target as HTMLInputElement;
     if (type === "file" && files) {
-      // Handle file input
       setFile(files[0]);
       setFormData({ ...formData, [name]: files[0] });
     } else {
-      // Handle other inputs (text, textarea, etc.)
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTagInput(e.target.value);
+  };
+
+  const handleTagKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "," && tagInput.trim()) {
+      e.preventDefault();
+      setTags([...tags, tagInput.trim()]);
+      setTagInput("");
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const clearFile = () => {
@@ -37,25 +55,29 @@ export default function CreateThreads() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
-      const threadData = {
-        ...formData,
-      };
-
-      console.log(threadData);
-      
+      const threadData = new FormData();
+      threadData.append("title", formData.title);
+      threadData.append("content", formData.content);
+      if (file) threadData.append("file", file);
+      if (tags.length > 0) threadData.append("tags", tags.join(","));
 
       // Post data to the backend
-      await axios.post(`${import.meta.env.VITE_SERVER_URL}/threads/createthread`, threadData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}/threads/createthread`,
+        threadData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setSuccess(true);
       setFormData({ title: "", content: "", file: null });
+      setTags([]);
     } catch (err) {
       console.error(err);
       setError("Failed to create the thread. Please try again.");
@@ -103,36 +125,69 @@ export default function CreateThreads() {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="file" className="block text-sm font-medium text-gray-700">
-              File Upload <p> Only images, videos or zip allowed! Max Size: 10MB</p>
+          <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
+            Tags
           </label>
+          <div className="flex flex-wrap items-center gap-2 border border-gray-300 rounded-md px-3 py-2 mt-1">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="bg-indigo-100 text-indigo-700 text-sm font-medium px-2 py-1 rounded flex items-center gap-2"
+              >
+                {tag}
+                <button
+                  type="button"
+                  className="text-red-500 hover:text-red-700"
+                  onClick={() => removeTag(tag)}
+                >
+                  &#x2715; {/* Cross icon */}
+                </button>
+              </span>
+            ))}
+            <input
+              type="text"
+              id="tags"
+              value={tagInput}
+              onChange={handleTagInputChange}
+              onKeyDown={handleTagKeyPress}
+              className="flex-grow border-none focus:outline-none"
+              placeholder="Add a tag and press comma..."
+            />
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="file" className="block text-sm font-medium text-gray-700">
+            File Upload
+          </label>
+          <p className="text-xs"> (Only images, videos or zip allowed! Max Size: 10MB) </p>
           <div className="relative mt-1 flex items-center">
             <input
-                id="file"
-                name="file"
-                type="file"
-                onChange={handleInputChange}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+              id="file"
+              name="file"
+              type="file"
+              onChange={handleInputChange}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
                 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold 
                 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
             />
             {file && (
               <button
-                  type="button"
-                  onClick={clearFile}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-red-500 focus:outline-none"
-                  aria-label="Clear file"
+                type="button"
+                onClick={clearFile}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-red-500 focus:outline-none"
+                aria-label="Clear file"
               >
-                  &#x2715; {/* Cross Icon */}
+                &#x2715; {/* Cross Icon */}
               </button>
             )}
           </div>
           {file && (
-              <p className="mt-2 text-sm text-gray-600">
-                  Selected File: <span className="font-medium">{file.name}</span>
-              </p>
-            )}
+            <p className="mt-2 text-sm text-gray-600">
+              Selected File: <span className="font-medium">{file.name}</span>
+            </p>
+          )}
         </div>
 
         <button
