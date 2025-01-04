@@ -27,6 +27,7 @@ import GroupPage from "./Pages/Groups/GroupPage";
 import CreateGroupThread from "./Pages/Groups/CreateGroupThread";
 import "react-calendar/dist/Calendar.css";
 import Notifications from "./Pages/Notifications/Notifications";
+import ThreadsByTag from "./Pages/Tag/ThreadsByTag";
 
 export default function App() {
   useEffect(() => {
@@ -118,6 +119,16 @@ export default function App() {
           element={
             <RequireAuth>
               <Notifications />
+
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/tag/:tag"
+          element={
+            <RequireAuth>
+              <ThreadsByTag />
 
             </RequireAuth>
           }

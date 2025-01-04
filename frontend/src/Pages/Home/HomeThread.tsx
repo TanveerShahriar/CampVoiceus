@@ -200,7 +200,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
               <Link
                 to={`/tag/${tag}`}
                 key={index}
-                className="bg-indigo-100 text-indigo-700 text-sm px-2 py-1 rounded-md mr-2 hover:bg-indigo-200"
+                className="bg-indigo-100 text-purple-700 text-sm px-1 py-1 rounded-sm mr-2 hover:bg-indigo-200"
               >
                 #{tag}
               </Link>
