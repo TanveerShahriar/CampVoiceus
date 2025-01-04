@@ -1,9 +1,12 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface Voter {
   id: string;
   name: string;
+  username: string;
+  avatarUrl: string;
 }
 
 interface ModalProps {
@@ -22,18 +25,27 @@ const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
         const token = localStorage.getItem("token");
         const voterData = await Promise.all(
           votes.map(async (id) => {
-            const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/getuserbyid`, {id}, {
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            return { id, name: response.data.name };
+            const response = await axios.post(
+              `${import.meta.env.VITE_SERVER_URL}/users/getuserbyid`,
+              { id },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            return {
+              id,
+              name: response.data.name,
+              username: response.data.username,
+              avatarUrl: response.data.avatarUrl,
+            };
           })
         );
         setVoters(voterData);
       } catch (error) {
-        console.error('Error fetching voter names:', error);
+        console.error("Error fetching voter names:", error);
       }
     };
 
@@ -66,12 +78,25 @@ const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
         <h2 className="text-xl font-semibold mb-4">{voteType}</h2>
         <div className="flex-1 overflow-y-auto">
           {voters.map((voter) => (
-            <div
-              key={voter.id}
-              className="flex items-center bg-gray-100 hover:bg-gray-200 transition p-3 rounded-lg shadow-sm mb-2"
+            <Link
+              to={`/profile/${voter.username}`}
+              key={voter.username}
+              className="flex items-center mb-1 p-2 rounded-md bg-gray-300/50 hover:bg-gray-400 transition"
             >
-              <span className="text-gray-800 font-medium">{voter.name}</span>
-            </div>
+              <img
+                src={voter.avatarUrl || "/placeholder.png?height=40&width=40"}
+                alt={`${voter.name}'s avatar`}
+                className="w-10 h-10 rounded-full mr-3 object-cover"
+              />
+              <div>
+                <p className="font-semibold text-sm hover:underline">
+                  {voter.name}
+                </p>
+                <p className="text-gray-600 text-xs hover:underline">
+                  @{voter.username}
+                </p>
+              </div>
+            </Link>
           ))}
         </div>
       </div>

@@ -31,6 +31,7 @@ interface Thread {
     _id: string;
     title: string;
     content: string;
+    tags?: string[];
     authorId: string;
     authorInfo?: AuthorInfo;
     comments: Comment[];
@@ -187,6 +188,27 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
         }
     }
 
+    const renderContentWithLineBreaks = (content: string) => {
+        return { __html: content.replace(/\n/g, "<br/>") };
+      };
+
+    const renderTags = (tags?: string[]) => {
+        if (!tags || tags.length === 0) return null;
+        return (
+          <div className="flex flex-wrap items-center mb-4">
+            {tags.map((tag, index) => (
+              <Link
+                to={`/tag/${tag}`}
+                key={index}
+                className="bg-indigo-100 text-purple-700 text-sm px-1 py-1 rounded-sm mr-2 hover:bg-indigo-200"
+              >
+                #{tag}
+              </Link>
+            ))}
+          </div>
+        );
+      };
+
     return (
         <div className="p-6 bg-white rounded-lg shadow-md">
             <div className="flex items-center mb-4">
@@ -207,7 +229,10 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
                     {stateThread.title}
                 </Link>
             </h2>
-            <p className="text-gray-700 mb-4">{stateThread.content}</p>
+            <p
+                className="text-gray-700 mb-4"
+                dangerouslySetInnerHTML={renderContentWithLineBreaks(stateThread.content)}
+            ></p>
 
             {stateThread.file ? (
                 <div className="my-4 p-4 border rounded-md bg-gray-50 shadow-sm">
@@ -224,6 +249,8 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
             ) : (
                 <p></p>
             )}
+
+            {renderTags(stateThread.tags)}
 
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">

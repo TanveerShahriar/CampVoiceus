@@ -16,7 +16,7 @@ import CreateThreads from "./Pages/Threads/CreateThreads";
 import Dashboard from "./Pages/Profile/DashBoard";
 import ViewProfile from "./Pages/Profile/ViewProfile";
 import ProfileEdit from "./Pages/Profile/ProfileEdit";
-import ThreadDetails from "./Pages/Home/ThreadDetails";
+import ThreadDetails from "./components/ThreadDetails"
 import CommunityCalendar from "./Pages/Calendar/CommunityCalendar";
 import CreateEvent from "./Pages/Calendar/CreateEvent";
 import MyEvents from "./Pages/Calendar/MyEvents";
@@ -27,6 +27,7 @@ import GroupPage from "./Pages/Groups/GroupPage";
 import CreateGroupThread from "./Pages/Groups/CreateGroupThread";
 import "react-calendar/dist/Calendar.css";
 import Notifications from "./Pages/Notifications/Notifications";
+import ThreadsByTag from "./Pages/Tag/ThreadsByTag";
 
 export default function App() {
   useEffect(() => {
@@ -118,6 +119,16 @@ export default function App() {
           element={
             <RequireAuth>
               <Notifications />
+
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/tag/:tag"
+          element={
+            <RequireAuth>
+              <ThreadsByTag />
 
             </RequireAuth>
           }
