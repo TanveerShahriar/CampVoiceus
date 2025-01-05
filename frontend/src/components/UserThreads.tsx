@@ -23,6 +23,7 @@ interface Thread {
     contentType: string;
     data: ArrayBuffer;
   };
+  createdAt: string;
 }
 
 interface UserThreadsProps {

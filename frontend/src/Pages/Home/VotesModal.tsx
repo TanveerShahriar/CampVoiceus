@@ -80,19 +80,21 @@ const VotesModal: React.FC<ModalProps> = ({ voteType, votes, isOpenState }) => {
           {voters.map((voter) => (
             <Link
               to={`/profile/${voter.username}`}
-              key={voter.username}
-              className="flex items-center mb-1 p-2 rounded-md bg-gray-300/50 hover:bg-gray-400 transition"
+              className="flex items-center group p-1 mb-1 sm:mb-1 border border-separate bg-slate-200 rounded-lg transition-all duration-300 hover:border-indigo-500"
             >
               <img
-                src={voter.avatarUrl || "/placeholder.png?height=40&width=40"}
+                src={
+                  voter.avatarUrl ||
+                  "/placeholderCropped.png"
+                }
                 alt={`${voter.name}'s avatar`}
-                className="w-10 h-10 rounded-full mr-3 object-cover"
+                className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-transparent group-hover:border-indigo-500 transition-all duration-300"
               />
               <div>
-                <p className="font-semibold text-sm hover:underline">
+                <p className="font-semibold text-sm group-hover:text-indigo-600 transition-colors duration-300">
                   {voter.name}
                 </p>
-                <p className="text-gray-600 text-xs hover:underline">
+                <p className="text-gray-500 text-xs group-hover:text-indigo-400 transition-colors duration-300">
                   @{voter.username}
                 </p>
               </div>

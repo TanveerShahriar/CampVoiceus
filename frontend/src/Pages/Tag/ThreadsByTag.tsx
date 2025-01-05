@@ -24,6 +24,7 @@ interface Thread {
     contentType: string;
     data: ArrayBuffer;
   };
+  createdAt: string;
 }
 
 const ThreadsByTag: React.FC = () => {

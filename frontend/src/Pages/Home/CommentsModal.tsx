@@ -9,14 +9,16 @@ interface Comment {
     upvotes: string[];
     downvotes: string[];
     userName: string;
+    createdAt: string;
 }
 
 interface ModalProps {
     isOpenState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
     threadId: string;
+    isQna: boolean;
 }
 
-const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
+const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId, isQna }) => {
     const [isOpen, setIsOpen] = isOpenState;
     const [comments, setComments] = useState<Comment[]>([]);
     const [commentsWithNames, setCommentsWithNames] = useState<Comment[]>([]);
@@ -123,13 +125,15 @@ const CommentsModal: React.FC<ModalProps> = ({ isOpenState, threadId }) => {
                 >
                     &times;
                 </button>
-                <h2 className="text-xl font-semibold mb-4">Comments</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                    {isQna ? "Q&A Answers" : "Comments"}
+                </h2>
                 <div className="flex-1 overflow-y-auto mb-4">
                     {commentsWithNames.map((comment) => (
-                        <CommentModal key={comment.commentId} comment={comment} threadId={threadId}></CommentModal>
+                        <CommentModal key={comment.commentId} comment={comment} threadId={threadId} isQna={isQna}></CommentModal>
                     ))}
                     {commentsWithNames.length === 0 && (
-                        <p className="text-gray-600 text-center">No comments available.</p>
+                        <p className="text-gray-600 text-center">No {isQna ? "answers" : "comments"} available.</p>
                     )}
                 </div>
                 <div className="flex items-center border-t pt-2">

@@ -1,10 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
 
-export default function CreateThreads() {
+export default function CreateQna() {
   const [formData, setFormData] = useState({
     title: "",
-    content: "",
     file: null,
   });
   const [tags, setTags] = useState<string[]>([]);
@@ -15,10 +14,8 @@ export default function CreateThreads() {
   const [tagInput, setTagInput] = useState("");
 
   // Handle input changes
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, files, type } = e.target as HTMLInputElement;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, files, type } = e.target;
     if (type === "file" && files) {
       setFile(files[0]);
       setFormData({ ...formData, [name]: files[0] });
@@ -57,17 +54,17 @@ export default function CreateThreads() {
     try {
       const token = localStorage.getItem("token");
 
-      const threadData = new FormData();
-      threadData.append("title", formData.title);
-      threadData.append("content", formData.content);
-      if (file) threadData.append("file", file);
-      if (tags.length > 0) threadData.append("tags", tags.join(","));
-      threadData.append("type", "thread");
+      const qnaData = new FormData();
+      qnaData.append("title", `QNA: ${formData.title}`);
+      if (file) qnaData.append("file", file);
+      if (tags.length > 0) qnaData.append("tags", tags.join(","));
+      qnaData.append("type", "qna");
+      qnaData.append("content", "");
 
       // Post data to the backend
       await axios.post(
         `${import.meta.env.VITE_SERVER_URL}/threads/createthread`,
-        threadData,
+        qnaData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -77,11 +74,11 @@ export default function CreateThreads() {
       );
 
       setSuccess(true);
-      setFormData({ title: "", content: "", file: null });
+      setFormData({ title: "", file: null });
       setTags([]);
     } catch (err) {
       console.error(err);
-      setError("Failed to create the thread. Please try again.");
+      setError("Failed to create the Q&A. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -89,36 +86,21 @@ export default function CreateThreads() {
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold text-center mb-6">Create a Thread</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">Create a Q&A</h1>
 
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-      {success && <p className="text-green-500 text-sm mb-4">Thread created successfully!</p>}
+      {success && <p className="text-green-500 text-sm mb-4">Q&A created successfully!</p>}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-            Title
+            Question
           </label>
           <input
             type="text"
             id="title"
             name="title"
             value={formData.title}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700">
-            Content
-          </label>
-          <textarea
-            id="content"
-            name="content"
-            rows={6}
-            value={formData.content}
             onChange={handleInputChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             required
@@ -198,7 +180,7 @@ export default function CreateThreads() {
             loading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"
           } text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
         >
-          {loading ? "Submitting..." : "Submit Thread"}
+          {loading ? "Submitting..." : "Submit Q&A"}
         </button>
       </form>
     </div>
