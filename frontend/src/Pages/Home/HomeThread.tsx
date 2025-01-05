@@ -214,7 +214,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
             <div className="flex items-center mb-4">
                 <Link to={`/profile/${stateThread.authorInfo?.username}`} className="flex items-center">
                     <img
-                        src={stateThread.authorInfo?.avatarUrl || '/placeholder.png?height=40&width=40'}
+                        src={stateThread.authorInfo?.avatarUrl || '/placeholderCropped.png'}
                         alt={`${stateThread.authorInfo?.name}'s avatar`}
                         className="w-10 h-10 rounded-full mr-3 object-cover"
                     />

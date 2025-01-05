@@ -58,7 +58,7 @@ const Dashboard: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-5">
               <div className="flex justify-center sm:justify-start -mt-16 sm:-mt-24 mb-4 sm:mb-0">
                 <img
-                  src={user.avatarUrl || '/placeholder.svg?height=150&width=150'}
+                  src={user.avatarUrl || '/placeholderCropped.png'}
                   alt="Avatar"
                   className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
                 />

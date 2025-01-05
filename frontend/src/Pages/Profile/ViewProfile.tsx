@@ -53,7 +53,7 @@ const ViewProfile: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-5">
               <div className="flex justify-center sm:justify-start -mt-16 sm:-mt-24 mb-4 sm:mb-0">
                 <img
-                  src={profile.avatarUrl || '/placeholder.svg?height=150&width=150'}
+                  src={profile.avatarUrl || '/placeholderCropped.png'}
                   alt={`${profile.name}'s avatar`}
                   className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
                 />
