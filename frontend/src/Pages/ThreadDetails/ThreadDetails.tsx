@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ThreadWithComments from "./ThreadWithComments";
-import { Thread } from "./types";
+import ThreadWithComments from "../../components/ThreadWithComments";
+import { Thread } from "../../components/types";
 
 export default function ThreadDetails() {
   const { threadId } = useParams<{ threadId: string }>();

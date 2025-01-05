@@ -1,9 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import CommentsVotingModal from "./CommentsVotingModal";
 import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom";
 import { formatDate } from "../../utils/dateFormatter";
+import VotesModal from "./VotesModal";
 
 interface AuthorInfo {
   _id: string;
@@ -216,7 +216,7 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
         </div>
 
         {isOpenUpvote && (
-          <CommentsVotingModal
+          <VotesModal
             voteType="Upvotes"
             votes={stateComment.upvotes}
             isOpenState={[isOpenUpvote, setIsOpenUpvote]}
@@ -224,7 +224,7 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
         )}
 
         {isOpenDownvote && (
-          <CommentsVotingModal
+          <VotesModal
             voteType="Downvotes"
             votes={stateComment.downvotes}
             isOpenState={[isOpenDownvote, setIsOpenDownvote]}
