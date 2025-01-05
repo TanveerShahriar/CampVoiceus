@@ -41,6 +41,34 @@ const userSchema = new mongoose.Schema({
         required: false,
     },
 
+    expertise: {
+        type: [
+          {
+            name: { type: String, required: true },
+            credentialUrl: { type: String, required: true },
+          },
+        ],
+        validate: {
+          validator: function (expertise) {
+            return expertise.length <= 3;
+          },
+          message: "You can only have up to 3 areas of expertise.",
+        },
+        required: false,
+      },
+
+    interests: {
+        type: [String], 
+        default: [], 
+        validate: {
+            validator: function (interests) {
+              return interests.length <= 5;
+            },
+            message: "You can only have up to 5 interests.",
+        },
+        required: false
+    },
+
     fcmToken: { 
         type: String,
         required: false,

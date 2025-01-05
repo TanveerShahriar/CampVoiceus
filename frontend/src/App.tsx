@@ -28,6 +28,7 @@ import CreateGroupThread from "./Pages/Groups/CreateGroupThread";
 import "react-calendar/dist/Calendar.css";
 import Notifications from "./Pages/Notifications/Notifications";
 import ThreadsByTag from "./Pages/Tag/ThreadsByTag";
+import ExpertiseEdit from "./Pages/Profile/ExpertiseEdit";
 
 export default function App() {
   useEffect(() => {
@@ -130,6 +131,15 @@ export default function App() {
             <RequireAuth>
               <ThreadsByTag />
 
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/expertise/edit"
+          element={
+            <RequireAuth>
+              <ExpertiseEdit />
             </RequireAuth>
           }
         />

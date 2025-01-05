@@ -23,6 +23,10 @@ router.get('/token', UserController.getUserByToken);
 
 router.put('/profile/edit', upload.single('avatarUrl'), UserController.updateUserByUsername);
 
+router.put('/profile/expertise/edit', upload.single('expertCredentialsUrl'), UserController.updateExpertiseByUsername);
+
+router.delete('/profile/expertise/delete', UserController.deleteExpertiseByUsername);
+
 router.get('/notifications', getNotifications);
 
 export default router;
