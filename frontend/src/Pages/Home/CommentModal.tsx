@@ -149,15 +149,13 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
 
   return (
     <div className="flex flex-col bg-gray-100 transition p-3 rounded-lg shadow-sm mb-2">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
         <Link
           to={`/profile/${stateComment.authorInfo?.username}`}
-          className="flex items-center group"
+          className="flex items-center group mb-2 sm:mb-0"
         >
           <img
-            src={
-              stateComment.authorInfo?.avatarUrl || "/placeholderCropped.png"
-            }
+            src={stateComment.authorInfo?.avatarUrl || "/placeholderCropped.png"}
             alt={`${stateComment.authorInfo?.name}'s avatar`}
             className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-transparent group-hover:border-indigo-500 transition-all duration-300"
           />
@@ -170,6 +168,9 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
             </p>
           </div>
         </Link>
+        <span className="text-green-600/70 text-sm font-medium sm:ml-4">
+          {formatDate(stateComment.createdAt)}
+        </span>
       </div>
       <p className="text-gray-700 mb-2">{stateComment.content}</p>
       <div className="flex items-center justify-between p-1">
@@ -229,9 +230,6 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
             isOpenState={[isOpenDownvote, setIsOpenDownvote]}
           />
         )}
-      </div>
-      <div className="text-sm text-gray-500 mt-2 ml-1">
-        {formatDate(stateComment.createdAt)}
       </div>
     </div>
   );

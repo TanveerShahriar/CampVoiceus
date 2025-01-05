@@ -156,10 +156,10 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
     <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
       {/* Thread Details */}
       <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
           <Link
             to={`/profile/${stateThread.authorInfo?.username}`}
-            className="flex items-center group"
+            className="flex items-center group mb-2 sm:mb-0"
           >
             <img
               src={
@@ -177,7 +177,11 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
               </p>
             </div>
           </Link>
+          <span className="text-green-600/70 text-sm font-medium sm:ml-4">
+            {formatDate(stateThread.createdAt)}
+          </span>
         </div>
+
         <h2 className="text-2xl font-bold text-indigo-600 mb-4 transition-colors duration-300 hover:text-indigo-700">
           {stateThread.title}
         </h2>
@@ -229,9 +233,6 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
               {stateThread.downvotes.length}
             </button>
           </div>
-        </div>
-        <div className="text-sm text-gray-500 mt-2 ml-1">
-          {formatDate(stateThread.createdAt)}
         </div>
       </div>
 
