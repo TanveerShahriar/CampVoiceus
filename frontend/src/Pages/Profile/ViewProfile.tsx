@@ -98,15 +98,16 @@ const ViewProfile: React.FC = () => {
                 {profile.expertise && profile.expertise.length > 0 ? (
                   <div className="space-y-2">
                     {profile.expertise.map((exp, index) => (
+                      <span key={index} className="bg-orange-100 text-orange-600 text-sm font-medium px-3 py-1 mr-2 rounded-full">
                       <a
                         key={index}
                         href={exp.credentialUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block bg-indigo-100 text-indigo-800 text-sm font-medium px-4 py-2 rounded hover:bg-indigo-200 transition-colors duration-200"
-                      >
+                        >
                         {exp.name}
                       </a>
+                    </span>
                     ))}
                   </div>
                 ) : (
