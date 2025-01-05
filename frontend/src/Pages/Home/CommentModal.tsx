@@ -4,12 +4,14 @@ import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom";
 import { formatDate } from "../../utils/dateFormatter";
 import VotesModal from "./VotesModal";
+import { Award } from "lucide-react";
 
 interface AuthorInfo {
   _id: string;
   name: string;
   username: string;
   avatarUrl: string;
+  expertise?: Array<{ name: string; credentialUrl: string }>;
 }
 
 interface Comment {
@@ -25,6 +27,7 @@ interface Comment {
 interface CommentProps {
   comment: Comment;
   threadId: string;
+  isQna: boolean;
 }
 
 interface DecodedToken {
@@ -51,10 +54,11 @@ async function getAuthorInfo(
     name: response.data.name,
     username: response.data.username,
     avatarUrl: response.data.avatarUrl || "/placeholderCropped.png",
+    expertise: response.data.expertise,
   };
 }
 
-const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
+const CommentModal: React.FC<CommentProps> = ({ comment, threadId, isQna }) => {
   const [stateComment, setStateComment] = useState<Comment>(comment);
   const [isOpenUpvote, setIsOpenUpvote] = useState<boolean>(false);
   const [isOpenDownvote, setIsOpenDownvote] = useState<boolean>(false);
@@ -155,7 +159,9 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
           className="flex items-center group mb-2 sm:mb-0"
         >
           <img
-            src={stateComment.authorInfo?.avatarUrl || "/placeholderCropped.png"}
+            src={
+              stateComment.authorInfo?.avatarUrl || "/placeholderCropped.png"
+            }
             alt={`${stateComment.authorInfo?.name}'s avatar`}
             className="w-12 h-12 rounded-full mr-3 object-cover border-2 border-transparent group-hover:border-indigo-500 transition-all duration-300"
           />
@@ -172,6 +178,38 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId }) => {
           {formatDate(stateComment.createdAt)}
         </span>
       </div>
+      
+      {isQna && (
+        <div className="flex p-2 bg-blue-200 rounded-lg">
+          <div className="flex items-center space-x-4">
+          <Award className="w-5 h-5 text-blue-500" />
+            <span className="text-blue-600 font-semibold text-sm">Expertise</span>
+          </div>
+          {stateComment.authorInfo?.expertise &&
+          stateComment.authorInfo?.expertise.length > 0 ? (
+            <div className="ml-2 space-y-2">
+              {stateComment.authorInfo?.expertise.map((exp, index) => (
+                <span
+                  key={index}
+                  className="bg-orange-100 text-orange-600 text-sm font-medium px-3 py-1 mr-2 rounded-full"
+                >
+                  <a
+                    key={index}
+                    href={exp.credentialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {exp.name}
+                  </a>
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">No known expertise</p>
+          )}
+        </div>
+      )}
+
       <p className="text-gray-700 mb-2">{stateComment.content}</p>
       <div className="flex items-center justify-between p-1">
         <div className="flex items-center space-x-4">

@@ -165,7 +165,7 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
           <Link
             to={`/tag/${tag}`}
             key={index}
-            className="bg-indigo-100 text-purple-700 text-sm px-1 py-1 rounded-sm mr-2 hover:bg-indigo-200"
+            className="bg-indigo-100 text-purple-700 text-sm px-1 py-1 rounded-md mr-2 hover:bg-indigo-200"
           >
             #{tag}
           </Link>
@@ -282,18 +282,23 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
 
       {/* Comments */}
       <div className="p-6 bg-gray-50">
-        <h3 className="text-xl font-bold mb-6 text-gray-800">Comments</h3>
+        {isQna ? (
+          <h3 className="text-xl font-bold mb-6 text-green-600">Answers</h3>
+        ) : (
+          <h3 className="text-xl font-bold mb-6 text-gray-800">Comments</h3>
+        )}
         <div className="space-y-6">
           {stateThread.comments.map((comment) => (
             <CommentModal
               key={comment.commentId}
               comment={comment}
               threadId={stateThread._id}
+              isQna={isQna}
             />
           ))}
           {stateThread.comments.length === 0 && (
             <p className="text-gray-600 italic">
-              No comments yet. Be the first to comment!
+              No {isQna ? "answers" : "comments"} yet. Be the first to {isQna ? "answer" : "comment"}!
             </p>
           )}
         </div>

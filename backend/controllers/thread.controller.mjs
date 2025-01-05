@@ -174,8 +174,15 @@ export async function upvote(req, res) {
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
 
-            const notificationTitle = "Your thread was upvoted!";
-            const notificationMessage = `${upvoterName} just upvoted your thread titled "${thread.title}".`;
+            const notificationTitle = "";
+            const notificationMessage = "";
+            if (thread.type === "qna") {
+                notificationTitle = "Your Question was upvoted!";
+                notificationMessage = `${upvoterName} just upvoted your Question titled "${thread.title}".`;
+            } else {
+                notificationTitle = "Your thread was upvoted!";
+                notificationMessage = `${upvoterName} just upvoted your thread titled "${thread.title}".`;
+            }
 
             await sendNotification(
                 author.fcmToken,
@@ -248,8 +255,16 @@ export async function downvote(req, res) {
         // Fetch thread author's FCM token
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
-            const notificationTitle = "Your thread was downvoted!";
-            const notificationMessage = `${downvoterName} just downvoted your thread titled "${thread.title}".`;
+
+            const notificationTitle = "";
+            const notificationMessage = "";
+            if (thread.type === "qna") {
+                notificationTitle = "Your Question was downvoted!";
+                notificationMessage = `${downvoterName} just downvoted your Question titled "${thread.title}".`;
+            } else {
+                notificationTitle = "Your thread was downvoted!";
+                notificationMessage = `${downvoterName} just downvoted your thread titled "${thread.title}".`;
+            }
 
             await sendNotification(
                 author.fcmToken,
@@ -328,8 +343,15 @@ export async function comment(req, res) {
         // Fetch thread author's FCM token
         const author = await User.findById(thread.authorId);
         if (author?.fcmToken) {
-            const notificationTitle = "New comment on your thread!";
-            const notificationMessage = `${commenterName} just commented on your thread titled "${thread.title}".`;
+            const notificationTitle = "";
+            const notificationMessage = "";
+            if (thread.type === "qna") {
+                notificationTitle = "New answer on your Q&A!";
+                notificationMessage = `${commenterName} just answered your Q&A titled "${thread.title}".`;
+            } else {
+                notificationTitle = "New comment on your thread!";
+                notificationMessage = `${commenterName} just commented on your thread titled "${thread.title}".`;
+            }
 
             await sendNotification(
                 author.fcmToken,
@@ -425,8 +447,16 @@ export async function upvoteComment(req, res) {
 
         const author = await User.findById(comment.userId);
         if (author?.fcmToken) {
-            const notificationTitle = "Your comment was upvoted!";
-            const notificationMessage = `${upvoterName} just upvoted your comment on the thread titled "${thread.title}".`;
+
+            const notificationTitle = "";
+            const notificationMessage = "";
+            if (thread.type === "qna") {
+                notificationTitle = "Your answer was upvoted!";
+                notificationMessage = `${upvoterName} just upvoted your answer on the Q&A titled "${thread.title}".`;
+            } else {
+                notificationTitle = "Your comment was upvoted!";
+                notificationMessage = `${upvoterName} just upvoted your comment on the thread titled "${thread.title}".`;
+            }
 
             await sendNotification(
                 author.fcmToken,
@@ -505,8 +535,16 @@ export async function downvoteComment(req, res) {
 
         const author = await User.findById(comment.userId);
         if (author?.fcmToken) {
-            const notificationTitle = "Your comment was downvoted!";
-            const notificationMessage = `${downvoterName} just downvoted your comment on the thread titled "${thread.title}".`;
+
+            const notificationTitle = "";
+            const notificationMessage = "";
+            if (thread.type === "qna") {
+                notificationTitle = "Your answer was downvoted!";
+                notificationMessage = `${downvoterName} just downvoted your answer on the Q&A titled "${thread.title}".`;
+            } else {
+                notificationTitle = "Your comment was downvoted!";
+                notificationMessage = `${downvoterName} just downvoted your comment on the thread titled "${thread.title}".`;
+            }
 
             await sendNotification(
                 author.fcmToken,

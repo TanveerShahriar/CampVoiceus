@@ -177,7 +177,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
         { threadId },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Replace jwtToken with your actual token variable
+            Authorization: `Bearer ${token}`,
           },
           responseType: "blob",
         }
@@ -211,7 +211,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
           <Link
             to={`/tag/${tag}`}
             key={index}
-            className="bg-indigo-100 text-purple-700 text-sm px-1 py-1 rounded-sm mr-2 hover:bg-indigo-200"
+            className="bg-indigo-100 text-purple-700 text-sm px-1 py-1 rounded-md mr-2 hover:bg-indigo-200"
           >
             #{tag}
           </Link>
@@ -343,7 +343,8 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
           className="flex items-center space-x-4 py-1 px-4 rounded-md border 
       bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white"
         >
-          Comment <p className="py-1 px-3">{stateThread.comments.length}</p>
+          {isQna ? "Answers" : "Comments"}
+           <p className="py-1 px-3">{stateThread.comments.length}</p>
         </button>
       </div>
 
@@ -366,6 +367,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
         <CommentsModal
           isOpenState={[isOpenComment, setIsOpenComment]}
           threadId={stateThread._id}
+          isQna={isQna}
         />
       )}
     </div>
