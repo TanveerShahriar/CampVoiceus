@@ -287,7 +287,7 @@ const HomeThread: React.FC<GroupThreadProps> = ({ thread }) => {
             }
 
             {isOpenComment && 
-                <CommentsModal isOpenState={[isOpenComment, setIsOpenComment]} threadId={stateThread._id}></CommentsModal>
+                <CommentsModal isOpenState={[isOpenComment, setIsOpenComment]} threadId={stateThread._id} isQna={false}></CommentsModal>
             }
         </div>
     );

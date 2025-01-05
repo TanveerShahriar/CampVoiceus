@@ -28,6 +28,7 @@ interface Thread {
     upvotes: string[];
     downvotes: string[];
     file?: File;
+    createdAt: string;
 }
 
 export default function Home() {
