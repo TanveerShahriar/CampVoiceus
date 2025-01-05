@@ -1,6 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Menu, X, Home, User, Bell, PlusSquare, ShieldQuestion, LogOut, Calendar, Users, ChevronUp, ChevronDown } from 'lucide-react';
+import {
+  Menu,
+  X,
+  Home,
+  User,
+  Bell,
+  PlusSquare,
+  ShieldQuestion,
+  LogOut,
+  Calendar,
+  Users,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import CustomLink from "./CustomLink";
 
 export default function Header() {
@@ -15,14 +28,18 @@ export default function Header() {
     navigate("/login");
   };
 
-  const isLoggedIn = location.pathname !== "/login" && location.pathname !== "/register";
+  const isLoggedIn =
+    location.pathname !== "/login" && location.pathname !== "/register";
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleGroupsMenu = () => setIsGroupsOpen(!isGroupsOpen);
   const showCreateThread = !location.pathname.startsWith("/groups");
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsGroupsOpen(false);
       }
     }
@@ -39,7 +56,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0">
-              <img className="h-10 w-28" src="/campvoiceus.png" alt="CampVoiceUs" />
+              <img
+                className="h-10 w-28"
+                src="/campvoiceus.png"
+                alt="CampVoiceUs"
+              />
             </Link>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
@@ -48,10 +69,16 @@ export default function Header() {
                 </CustomLink>
                 {isLoggedIn && (
                   <>
-                    <CustomLink to="/dashboard" icon={<User className="w-5 h-5 mr-1" />}>
+                    <CustomLink
+                      to="/dashboard"
+                      icon={<User className="w-5 h-5 mr-1" />}
+                    >
                       Profile
                     </CustomLink>
-                    <CustomLink to="/notifications" icon={<Bell className="w-5 h-5 mr-1" />}>
+                    <CustomLink
+                      to="/notifications"
+                      icon={<Bell className="w-5 h-5 mr-1" />}
+                    >
                       Notifications
                     </CustomLink>
                     {showCreateThread && (
@@ -63,17 +90,20 @@ export default function Header() {
                       </CustomLink>
                     )}
                     <CustomLink
-                        to="/createqna"
-                        icon={<ShieldQuestion className="w-5 h-5 mr-1" />}
-                      >
-                        QNA
-                      </CustomLink>
-                    <CustomLink to="/myevents" icon={<Calendar className="w-5 h-5 mr-1" />}>
+                      to="/createqna"
+                      icon={<ShieldQuestion className="w-5 h-5 mr-1" />}
+                    >
+                      QNA
+                    </CustomLink>
+                    <CustomLink
+                      to="/myevents"
+                      icon={<Calendar className="w-5 h-5 mr-1" />}
+                    >
                       My Events
                     </CustomLink>
                     {/* Groups Dropdown */}
                     <div className="relative" ref={dropdownRef}>
-                      <button 
+                      <button
                         onClick={toggleGroupsMenu}
                         className="flex items-center text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
                       >
@@ -165,7 +195,10 @@ export default function Header() {
       {isMenuOpen && (
         <div className="md:hidden bg-indigo-600">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <CustomLink to="/" className="block text-white px-3 py-2 rounded-md text-base font-medium">
+            <CustomLink
+              to="/"
+              className="block text-white px-3 py-2 rounded-md text-base font-medium"
+            >
               Home
             </CustomLink>
             {isLoggedIn && (
@@ -176,6 +209,12 @@ export default function Header() {
                 >
                   Profile
                 </CustomLink>
+                <CustomLink
+                  to="/notifications"
+                  icon={<Bell className="w-5 h-5 mr-1" />}
+                >
+                  Notifications
+                </CustomLink>
                 {showCreateThread && (
                   <CustomLink
                     to="/createthread"
@@ -184,6 +223,12 @@ export default function Header() {
                     Create Thread
                   </CustomLink>
                 )}
+                <CustomLink
+                  to="/createqna"
+                  icon={<ShieldQuestion className="w-5 h-5 mr-1" />}
+                >
+                  QNA
+                </CustomLink>
                 <CustomLink
                   to="/myevents"
                   className="block text-white px-3 py-2 rounded-md text-base font-medium"
@@ -256,4 +301,3 @@ export default function Header() {
     </nav>
   );
 }
-
