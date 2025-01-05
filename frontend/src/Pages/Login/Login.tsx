@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -113,6 +113,11 @@ const Login: React.FC = () => {
           Login
         </button>
       </form>
+      <div className="text-center text-md mt-8 text-indigo-600 border-indigo-300/40 bg-indigo-200/70 p-2 rounded-md shadow-sm shadow-indigo-300 hover:border-2 hover:shadow-none">
+        <Link to="/register" className="">
+          Don't have an account? Register here.
+        </Link>
+      </div>
     </div>
   );
 };
