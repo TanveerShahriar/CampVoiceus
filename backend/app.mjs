@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { connectDB } from "./config/db.mjs";
 import routes from './routes/index.mjs';
+import  scheduleDailyEmail  from './cron/node_schedule.mjs'
 
 const app = express();
 
@@ -27,5 +28,6 @@ app.use(cors(corsOptions));
 connectDB();
 
 app.use('/api', routes);
+scheduleDailyEmail();
 
 export default app;
