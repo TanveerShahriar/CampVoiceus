@@ -150,7 +150,7 @@ const upload = multer({ storage: multer.memoryStorage() }); // Temporary memory 
 
 export const updateUserByUsername = async (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
-  const { name, bio } = req.body;
+  const { name, bio, interests } = req.body;
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -173,9 +173,20 @@ export const updateUserByUsername = async (req, res) => {
       avatarUrl = await uploadPromise;
     }
 
-    // Update user fields
+    let validatedInterests = [];
+    if (interests) {
+      validatedInterests = typeof interests === 'string' ? JSON.parse(interests) : interests;
+
+      if (!Array.isArray(validatedInterests) || validatedInterests.length > 5) {
+        return res
+          .status(400)
+          .json({ error: "You can only have up to 5 interests." });
+      }
+    }
+
     const updateFields = { name, bio };
     if (avatarUrl) updateFields.avatarUrl = avatarUrl;
+    if (validatedInterests.length > 0) updateFields.interests = validatedInterests;
 
     const user = await User.findByIdAndUpdate(
       decoded.id,
@@ -192,12 +203,14 @@ export const updateUserByUsername = async (req, res) => {
       name: user.name,
       bio: user.bio,
       avatarUrl: user.avatarUrl,
+      interests: user.interests,
     });
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ error: "An error occurred while updating user data" });
   }
 };
+
 
 
 export async function saveFcmToken(req, res) {
@@ -238,3 +251,119 @@ export async function saveFcmToken(req, res) {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+
+export const updateExpertiseByUsername = async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const { name } = req.body;
+  const file = req.file;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const userId = decoded.id;
+
+    if (!name) {
+      return res.status(400).json({ error: "Expertise name is required." });
+    }
+
+    let credentialUrl = null;
+    if (file) {
+      const uploadPromise = new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'campV_expertise_creds' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result.secure_url);
+          }
+        );
+        stream.end(file.buffer);
+      });
+      credentialUrl = await uploadPromise;
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const existingExpertiseIndex = user.expertise.findIndex(
+      (exp) => exp.name === name
+    );
+
+    if (existingExpertiseIndex >= 0) {
+      if (credentialUrl) {
+        const oldCredentialUrl = user.expertise[existingExpertiseIndex].credentialUrl;
+        if (oldCredentialUrl) {
+          const publicId = oldCredentialUrl.split('/').pop().split('.')[0];
+          await cloudinary.uploader.destroy(`campV_expertise_creds/${publicId}`);
+        }
+        user.expertise[existingExpertiseIndex].credentialUrl = credentialUrl;
+      }
+    } else {
+      if (!credentialUrl) {
+        return res
+          .status(400)
+          .json({ error: "Credential is required for a new expertise." });
+      }
+      user.expertise.push({ name, credentialUrl });
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Expertise updated successfully.",
+      expertise: user.expertise,
+    });
+  } catch (error) {
+    console.error("Error updating expertise:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating expertise." });
+  }
+};
+
+
+export const deleteExpertiseByUsername = async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: "Expertise name is required." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const userId = decoded.id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const expertiseIndex = user.expertise.findIndex(
+      (exp) => exp.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (expertiseIndex === -1) {
+      return res.status(404).json({ error: "Expertise not found." });
+    }
+
+    const credentialUrl = user.expertise[expertiseIndex].credentialUrl;
+    if (credentialUrl) {
+      const publicId = credentialUrl.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`campV_expertise_creds/${publicId}`);
+    }
+
+    user.expertise.splice(expertiseIndex, 1);
+    await user.save();
+
+    res.status(200).json({
+      message: "Expertise deleted successfully.",
+      expertise: user.expertise,
+    });
+  } catch (error) {
+    console.error("Error deleting expertise:", error);
+    res.status(500).json({ error: "An error occurred while deleting expertise." });
+  }
+};
