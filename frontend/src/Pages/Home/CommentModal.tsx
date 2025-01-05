@@ -205,7 +205,7 @@ const CommentModal: React.FC<CommentProps> = ({ comment, threadId, isQna }) => {
               ))}
             </div>
           ) : (
-            <p className="text-gray-600">No known expertise</p>
+            <p className="text-red-600 text-sm ml-2"> No known expertise</p>
           )}
         </div>
       )}
