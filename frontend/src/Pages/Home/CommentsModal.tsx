@@ -9,6 +9,7 @@ interface Comment {
     upvotes: string[];
     downvotes: string[];
     userName: string;
+    createdAt: string;
 }
 
 interface ModalProps {
