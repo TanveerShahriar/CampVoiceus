@@ -8,7 +8,7 @@ import { Notification } from '../models/index.mjs';
 
 export async function createThread(req, res) {
     try {
-        const { title, content, tags } = req.body; // Include tags in the request body
+        const { title, content, tags, type } = req.body; // Include tags in the request body
         const file = req.file;
 
         const token = req.headers.authorization?.split(" ")[1];
@@ -19,14 +19,16 @@ export async function createThread(req, res) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const authorId = decoded.id;
 
-        console.log(tags);
-
         const threadData = {
             title,
             content,
             authorId,
             tags: typeof tags === "string" ? tags.split(",").map(tag => tag.trim()) : tags,
         };
+
+        if (type) {
+            threadData.type = type;
+          }
     
         // Upload file to Cloudinary if present
         if (file) {

@@ -34,5 +34,6 @@ export interface AuthorInfo {
     downvotes: string[];
     file?: File;
     createdAt: string;
+    type?: string;
   }
   

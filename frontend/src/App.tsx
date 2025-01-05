@@ -29,6 +29,7 @@ import "react-calendar/dist/Calendar.css";
 import Notifications from "./Pages/Notifications/Notifications";
 import ThreadsByTag from "./Pages/Tag/ThreadsByTag";
 import ExpertiseEdit from "./Pages/Profile/ExpertiseEdit";
+import CreateQna from "./Pages/Threads/CreateQna";
 
 export default function App() {
   useEffect(() => {
@@ -144,7 +145,15 @@ export default function App() {
           }
         />
 
-        {/* Calendar Routes */}
+        <Route
+          path="/createqna"
+          element={
+            <RequireAuth>
+              <CreateQna />
+            </RequireAuth>
+          }
+        />
+
         <Route
           path="/threadDetails/:threadId"
           element={
@@ -153,6 +162,8 @@ export default function App() {
             </RequireAuth>
           }
         />
+
+        {/* Calendar Routes */}
         <Route
           path="/calendar"
           element={

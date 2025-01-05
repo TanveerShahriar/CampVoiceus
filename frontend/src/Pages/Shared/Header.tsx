@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Menu, X, Home, User, Bell, PlusSquare, LogOut, Calendar, Users, ChevronUp, ChevronDown } from 'lucide-react';
+import { Menu, X, Home, User, Bell, PlusSquare, ShieldQuestion, LogOut, Calendar, Users, ChevronUp, ChevronDown } from 'lucide-react';
 import CustomLink from "./CustomLink";
 
 export default function Header() {
@@ -62,6 +62,12 @@ export default function Header() {
                         Create Thread
                       </CustomLink>
                     )}
+                    <CustomLink
+                        to="/createqna"
+                        icon={<ShieldQuestion className="w-5 h-5 mr-1" />}
+                      >
+                        QNA
+                      </CustomLink>
                     <CustomLink to="/myevents" icon={<Calendar className="w-5 h-5 mr-1" />}>
                       My Events
                     </CustomLink>

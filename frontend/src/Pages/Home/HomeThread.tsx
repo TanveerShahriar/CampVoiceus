@@ -40,6 +40,7 @@ interface Thread {
   downvotes: string[];
   file?: File;
   createdAt: string;
+  type?: string;
 }
 
 interface HomeThreadProps {
@@ -57,6 +58,7 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
   const [isOpenDownvote, setIsOpenDownvote] = useState<boolean>(false);
   const [isOpenComment, setIsOpenComment] = useState<boolean>(false);
   const [userId, setUserId] = useState<string>("");
+  const [isQna, setIsQna] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -67,6 +69,9 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
     } else {
       console.error("No token found");
     }
+
+    setIsQna(stateThread.type === "qna");
+    console.log(stateThread.type);
 
     const fetchAuthorInfo = async () => {
       if (!stateThread.authorInfo) {
@@ -243,7 +248,8 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
       </div>
 
       {/* Title and Content */}
-      <h2 className="text-xl font-bold text-indigo-600 mb-2">
+      {isQna ? (
+        <h2 className="text-xl font-bold text-red-600 mb-2">
         <Link
           to={`/threadDetails/${stateThread._id}`}
           className="hover:underline"
@@ -251,6 +257,16 @@ const HomeThread: React.FC<HomeThreadProps> = ({ thread }) => {
           {stateThread.title}
         </Link>
       </h2>
+      ) : (
+        <h2 className="text-xl font-bold text-indigo-600 mb-2">
+        <Link
+          to={`/threadDetails/${stateThread._id}`}
+          className="hover:underline"
+        >
+          {stateThread.title}
+        </Link>
+      </h2>
+      )}
       <p
         className="text-gray-700 mb-4"
         dangerouslySetInnerHTML={renderContentWithLineBreaks(

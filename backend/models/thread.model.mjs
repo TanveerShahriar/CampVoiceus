@@ -23,8 +23,8 @@ const FileSchema = new mongoose.Schema({
 // Define the Thread schema
 const ThreadSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  type: { type: String, default: 'thread', required: true },
-  content: { type: String, required: true },
+  type: { type: String, required: false },
+  content: { type: String, required: false },
   authorId: { type: String, required: true },
   authorName: { type: String }, // New field to store authorName
   comments: { type: [CommentSchema], default: [] },

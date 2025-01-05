@@ -23,6 +23,7 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
   const [isDownvoteModalOpen, setIsDownvoteModalOpen] =
     useState<boolean>(false);
   const [userId, setUserId] = useState<string>("");
+  const [isQna, setIsQna] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -32,6 +33,10 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
       setUserId(decoded.id);
     } else {
       console.error("No token found");
+    }
+
+    if (stateThread.type === "qna") {
+      setIsQna(true);
     }
 
     const enrichThreadAuthor = async () => {
@@ -152,6 +157,23 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
     }
   };
 
+  const renderTags = (tags?: string[]) => {
+    if (!tags || tags.length === 0) return null;
+    return (
+      <div className="flex flex-wrap items-center mb-2">
+        {tags.map((tag, index) => (
+          <Link
+            to={`/tag/${tag}`}
+            key={index}
+            className="bg-indigo-100 text-purple-700 text-sm px-1 py-1 rounded-sm mr-2 hover:bg-indigo-200"
+          >
+            #{tag}
+          </Link>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
       {/* Thread Details */}
@@ -182,15 +204,26 @@ const ThreadWithComments: React.FC<ThreadWithCommentsProps> = ({ thread }) => {
           </span>
         </div>
 
-        <h2 className="text-2xl font-bold text-indigo-600 mb-4 transition-colors duration-300 hover:text-indigo-700">
+        {isQna ? (
+            <h2 className="text-2xl font-bold text-red-600 mb-4 transition-colors duration-300 hover:text-red-700">
           {stateThread.title}
         </h2>
+        ) :
+        (
+            <h2 className="text-2xl font-bold text-indigo-600 mb-4 transition-colors duration-300 hover:text-indigo-700">
+          {stateThread.title}
+        </h2>
+        )
+        }
         <p
           className="text-gray-700 mb-6 leading-relaxed"
           dangerouslySetInnerHTML={renderContentWithLineBreaks(
             stateThread.content
           )}
         ></p>
+
+        {/* Tags */}
+        {renderTags(stateThread.tags)}
 
         {/* Thread Voting */}
         <div className="flex items-center space-x-6">
